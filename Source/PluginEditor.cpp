@@ -17,7 +17,25 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (400, 200);
+
+    pregainSlider.setRange(-18.0, 12.0, 1.0);
+    //pregainSlider.setSliderStyle(Slider::LinearVertical);
+    pregainSlider.setTextValueSuffix(" dB");
+    pregainSlider.addListener(this);
+    addAndMakeVisible(pregainSlider);
+
+    pregainLabel.setText("Pre gain", dontSendNotification);
+    pregainLabel.attachToComponent(&pregainSlider, true);
+
+    levelSlider.setRange(-18.0, 12.0, 1.0);
+    levelSlider.setTextValueSuffix(" dB");
+    levelSlider.addListener(this);
+    addAndMakeVisible(levelSlider);
+
+    levelLabel.setText("Level Out", dontSendNotification);
+    levelLabel.attachToComponent(&levelSlider, true);
+
 }
 
 GgconvolverAudioProcessorEditor::~GgconvolverAudioProcessorEditor()
@@ -27,16 +45,25 @@ GgconvolverAudioProcessorEditor::~GgconvolverAudioProcessorEditor()
 //==============================================================================
 void GgconvolverAudioProcessorEditor::paint (Graphics& g)
 {
+    /*
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 
     g.setColour (Colours::white);
     g.setFont (15.0f);
     g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
+    */
+        
 }
 
 void GgconvolverAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    auto sliderLeft = 120;
+    pregainSlider.setBounds(sliderLeft, 20, getWidth() - sliderLeft - 10, 20);
+    levelSlider.setBounds(sliderLeft, 50, getWidth() - sliderLeft - 10, 20);
+    //pregainSlider.setBounds(40, 30, 20, getHeight() - 60);
+}
+void GgconvolverAudioProcessorEditor::sliderValueChanged(Slider* slider)
+{
+   
 }
