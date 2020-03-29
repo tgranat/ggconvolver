@@ -17,7 +17,7 @@
 /**
 */
 class GgconvolverAudioProcessorEditor  : public AudioProcessorEditor,
-                                         private Slider::Listener
+    private Slider::Listener, ComboBox::Listener
 {
 public:
     GgconvolverAudioProcessorEditor (GgconvolverAudioProcessor&);
@@ -29,15 +29,18 @@ public:
 
 private:
     void sliderValueChanged(Slider* slider) override;
+    void comboBoxChanged(ComboBox* comboBox) override;
+
+    ComboBox irChoice;
+    Slider preLevelSlider;
+    Label preLevelLabel;
+    Slider postLevelSlider;
+    Label postLevelLabel;
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     GgconvolverAudioProcessor& processor;
 
-    Slider pregainSlider;
-    Label pregainLabel;
-    Slider levelSlider;
-    Label levelLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GgconvolverAudioProcessorEditor)
 };

@@ -55,6 +55,11 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    // UI parameters
+    int menuChoice;
+    float preLevel = 0.0f;
+    float postLevel = 0.0f;
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GgconvolverAudioProcessor)

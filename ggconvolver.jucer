@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="LNwuGk" name="ggconvolver" projectType="audioplug" jucerVersion="5.4.7"
-              pluginFormats="buildAU,buildStandalone,buildVST3">
+              pluginFormats="buildAU,buildStandalone,buildVST3" pluginName="Simple Speaker Sim"
+              pluginDesc="Speaker simulator with predefined impulse responses"
+              pluginManufacturer="GranatGuitar">
   <MAINGROUP id="x962nL" name="ggconvolver">
     <GROUP id="{2676E8B1-F534-FACC-2A3D-EE2653730B7F}" name="Source">
       <FILE id="OJLaHO" name="PluginProcessor.cpp" compile="1" resource="0"
