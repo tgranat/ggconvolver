@@ -93,12 +93,17 @@ void GgconvolverAudioProcessor::changeProgramName (int index, const String& newN
 }
 
 //==============================================================================
+// Called when starting a plugin (not when enabled after been disabled)
+// Same as VST AudioEffect::setActive(1)
 void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 }
 
+// Called when plugin removed (not when only disabled)
+// Also called during startup of plugin (at least on Reaper: first avtivate, then deactivate, then activate again) 
+// Same as VST AudioEffect::setActive(0)
 void GgconvolverAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
