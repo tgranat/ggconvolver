@@ -13,9 +13,13 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
-//==============================================================================
-/**
-*/
+namespace defaults
+{
+    const float minSlider = -18.f;
+    const float maxSlider = 18.f;
+    const float sliderStep = 1.f;
+}
+
 class GgconvolverAudioProcessorEditor  : public AudioProcessorEditor,
     private Slider::Listener, ComboBox::Listener
 {
@@ -23,7 +27,6 @@ public:
     GgconvolverAudioProcessorEditor (GgconvolverAudioProcessor&);
     ~GgconvolverAudioProcessorEditor();
 
-    //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
 

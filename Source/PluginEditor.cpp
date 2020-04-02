@@ -20,18 +20,19 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     // editor's size to whatever you need it to be.
     setSize (400, 200);
 
-    preLevelSlider.setRange(-10.0f, 10.0f, 0.5f);
+    preLevelSlider.setRange(defaults::minSlider, defaults::maxSlider, defaults::sliderStep);
     //pregainSlider.setSliderStyle(Slider::LinearVertical);
     preLevelSlider.addListener(this);
     //preLevelSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-    //preLevelSlider.setTextValueSuffix(" Volume");
+    preLevelSlider.setTextValueSuffix(" dB");
     addAndMakeVisible(preLevelSlider);
     preLevelLabel.setText("Pre Level", dontSendNotification);
     preLevelLabel.attachToComponent(&preLevelSlider, true);
     addAndMakeVisible(preLevelLabel);
 
-    postLevelSlider.setRange(-10.0f, 10.0f, 0.5f);
+    postLevelSlider.setRange(defaults::minSlider, defaults::maxSlider, defaults::sliderStep);
     postLevelSlider.addListener(this);
+    postLevelSlider.setTextValueSuffix(" dB");
     addAndMakeVisible(postLevelSlider);
 
     //postLevelLabel.setFont(Font(15.0f, Font::bold));
@@ -80,10 +81,10 @@ void GgconvolverAudioProcessorEditor::resized()
 void GgconvolverAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
     if (&preLevelSlider == slider) {
-        processor.preLevel = preLevelSlider.getValue() / 10;
+        processor.preLevel = (float) Decibels::decibelsToGain(preLevelSlider.getValue());
     }
     if (&postLevelSlider == slider) {
-        processor.postLevel = postLevelSlider.getValue() / 10;
+        processor.postLevel = (float) Decibels::decibelsToGain(postLevelSlider.getValue());
     }
 }
 
