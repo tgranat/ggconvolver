@@ -80,16 +80,16 @@ void GgconvolverAudioProcessorEditor::resized()
 }
 void GgconvolverAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
-    if (&preLevelSlider == slider) {
-        processor.preLevel = (float) Decibels::decibelsToGain(preLevelSlider.getValue());
-    }
-    if (&postLevelSlider == slider) {
-        processor.postLevel = (float) Decibels::decibelsToGain(postLevelSlider.getValue());
-    }
+    //if (&preLevelSlider == slider) {
+   //     processor.preLevel = (float) Decibels::decibelsToGain(preLevelSlider.getValue());
+    //}
+    //if (&postLevelSlider == slider) {
+    //    processor.postLevel = (float) Decibels::decibelsToGain(postLevelSlider.getValue());
+    //}
 }
 
 void GgconvolverAudioProcessorEditor::comboBoxChanged(ComboBox* comboBox)
 {
-    processor.menuChoice = comboBox->getSelectedId();
+    //processor.menuChoice = comboBox->getSelectedId();
 }
 

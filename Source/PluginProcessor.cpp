@@ -14,16 +14,38 @@
 //==============================================================================
 GgconvolverAudioProcessor::GgconvolverAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", AudioChannelSet::stereo(), true)
+#endif
+    )
 #endif
 {
+    addParameter(preLevel = new AudioParameterFloat("preLevel",
+        "Pre Level",
+        NormalisableRange<float>(0.1f, 2.f, 0.1f),
+        1.0f,
+        "dB",
+        AudioProcessorParameter::genericParameter,
+        [](float value, int) { return String(20 * log10(value), 1); }));
+
+    addParameter(postLevel = new AudioParameterFloat("postLevel",
+        "Post Level",
+        NormalisableRange<float>(0.1f, 2.f, 0.1f),
+        1.0f,
+        "dB",
+        AudioProcessorParameter::genericParameter,
+        [](float value, int) { return String(20*log10(value), 1); }));
+       // [](float value, int) { return String((float)Decibels::decibelsToGain(value), 2); }));
+
+
+    addParameter(irChoice = new AudioParameterChoice("irChoice",
+        "Speaker",
+        { "speaker 1", "speaker 2", "speaker 3","speaker 4","speaker 5" },
+        0));
 }
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
@@ -102,7 +124,7 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 }
 
 // Called when plugin removed (not when only disabled)
-// Also called during startup of plugin (at least on Reaper: first avtivate, then deactivate, then activate again) 
+// Also called during startup of plugin (at least on Reaper: first activate, then deactivate, then activate again) 
 // Same as VST AudioEffect::setActive(0)
 void GgconvolverAudioProcessor::releaseResources()
 {
@@ -156,7 +178,7 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
 
-    buffer.applyGain(preLevel);
+    buffer.applyGain(*preLevel);
     
     //for (int channel = 0; channel < totalNumInputChannels; ++channel)
     //{
@@ -174,18 +196,26 @@ bool GgconvolverAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* GgconvolverAudioProcessor::createEditor()
 {
-    return new GgconvolverAudioProcessorEditor (*this);
+    //return new GgconvolverAudioProcessorEditor (*this);
+    return new GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
 void GgconvolverAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    
+    // You should use this method to store your parameters in the memory block.
+    // You could do that either as raw data, or use the XML or ValueTree classes
+    // as intermediaries to make it easy to save and load complex data.
 }
 
 void GgconvolverAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    
+    // You should use this method to restore your parameters from this memory block,
+    // whose contents will have been created by the getStateInformation() call.
+
+    // Note! This method may be called one or several times at startup of a plugin. This means
+    // the stored data will be overwritten with default/start values unless you
+    // have some logic here
 }
 
 //==============================================================================

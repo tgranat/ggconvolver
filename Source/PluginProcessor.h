@@ -56,9 +56,14 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     // UI parameters
-    int menuChoice;
-    float preLevel = 0.0f;
-    float postLevel = 0.0f;
+ 
+    AudioParameterChoice* irChoice;
+    AudioParameterFloat* preLevel;
+    AudioParameterFloat* postLevel;
+
+    //int menuChoice;
+    //float preLevel = 0.f;
+    //float postLevel = 0.0f;
 
 private:
     //==============================================================================
