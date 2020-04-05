@@ -14,6 +14,12 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="rhiLQv" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="rgsbyO" name="MM-210-back-U906_44100Hz_200ms.wav" compile="0"
+          resource="1" file="Resources/MM-210-back-U906_44100Hz_200ms.wav"/>
+    <FILE id="jeFQyn" name="MM-210-offaxis-U906_44100Hz_200ms.wav" compile="0"
+          resource="1" file="Resources/MM-210-offaxis-U906_44100Hz_200ms.wav"/>
+    <FILE id="AWnnFL" name="MM-210-onaxis-U906_44100Hz_200ms.wav" compile="0"
+          resource="1" file="Resources/MM-210-onaxis-U906_44100Hz_200ms.wav"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019">
@@ -36,6 +42,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../../../../juce-5.4.7-windows/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../../../juce-5.4.7-windows/JUCE/modules"/>
         <MODULEPATH id="juce_opengl" path="../../../../../juce-5.4.7-windows/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../juce-5.4.7-windows/JUCE/modules"/>
       </MODULEPATHS>
     </VS2019>
   </EXPORTFORMATS>
@@ -50,6 +57,7 @@
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

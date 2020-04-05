@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "BinaryData.h"
 
 //==============================================================================
 GgconvolverAudioProcessor::GgconvolverAudioProcessor()
@@ -39,13 +40,16 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
         "dB",
         AudioProcessorParameter::genericParameter,
         [](float value, int) { return String(20*log10(value), 1); }));
-       // [](float value, int) { return String((float)Decibels::decibelsToGain(value), 2); }));
+       // [](float value, int) { return String((float)Decibels::decibelsToGain(value), 2); })); // Didnt work, dont know why
 
-
-    addParameter(irChoice = new AudioParameterChoice("irChoice",
+    StringArray irNames = StringArray(&BinaryData::namedResourceList[0], BinaryData::namedResourceListSize);
+ 
+    addParameter(irChoice = new AudioParameterChoice(
+        "irChoice",
         "Speaker",
-        { "speaker 1", "speaker 2", "speaker 3","speaker 4","speaker 5" },
-        0));
+        irNames,
+        1));
+
 }
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
@@ -121,6 +125,23 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    //irChoice->getCurrentChoiceName();
+
+    // Initialize convolution  
+    dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = 1;
+    convolution.prepare(spec);
+    convolution.reset();    // maybe not necessary
+  
+    // Fetch from parameter
+    String irName = irChoice->getCurrentChoiceName();
+    currentIRLoaded = irChoice->getIndex();
+    int irSize;
+    const char* ir = BinaryData::getNamedResource(irName.toRawUTF8(), irSize);
+
+    convolution.loadImpulseResponse(ir, irSize, false, false, 0, true);
 }
 
 // Called when plugin removed (not when only disabled)
@@ -177,8 +198,22 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+    if (irChoice->getIndex() != currentIRLoaded) {
+        String irName = irChoice->getCurrentChoiceName();
+        currentIRLoaded = irChoice->getIndex();
+        int irSize;
+        const char* ir = BinaryData::getNamedResource(irName.toRawUTF8(), irSize);
+
+        convolution.loadImpulseResponse(ir, irSize, false, false, 0, true);
+    }
 
     buffer.applyGain(*preLevel);
+
+    dsp::AudioBlock<float> block(buffer);
+    dsp::ProcessContextReplacing<float> context(block);
+    convolution.process(context);
+
+    buffer.applyGain(*postLevel);
     
     //for (int channel = 0; channel < totalNumInputChannels; ++channel)
     //{

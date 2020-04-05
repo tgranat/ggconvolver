@@ -66,6 +66,9 @@ public:
     //float postLevel = 0.0f;
 
 private:
+    dsp::Convolution convolution;
+    int currentIRLoaded = 0;
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GgconvolverAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GgconvolverAudioProcessor)
+ 
 };
