@@ -125,7 +125,6 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    //irChoice->getCurrentChoiceName();
 
     // Initialize convolution  
     dsp::ProcessSpec spec;
@@ -133,15 +132,7 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = 1;
     convolution.prepare(spec);
-    convolution.reset();    // maybe not necessary
-  
-    // Fetch from parameter
-    String irName = irChoice->getCurrentChoiceName();
-    currentIRLoaded = irChoice->getIndex();
-    int irSize;
-    const char* ir = BinaryData::getNamedResource(irName.toRawUTF8(), irSize);
-
-    convolution.loadImpulseResponse(ir, irSize, false, false, 0, true);
+    updateCovolution();
 }
 
 // Called when plugin removed (not when only disabled)
@@ -198,13 +189,10 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    if (irChoice->getIndex() != currentIRLoaded) {
-        String irName = irChoice->getCurrentChoiceName();
-        currentIRLoaded = irChoice->getIndex();
-        int irSize;
-        const char* ir = BinaryData::getNamedResource(irName.toRawUTF8(), irSize);
 
-        convolution.loadImpulseResponse(ir, irSize, false, false, 0, true);
+    // Check if IR to use has been changed in GUI
+    if (irChoice->getIndex() != currentIRLoaded) {
+        updateCovolution();
     }
 
     buffer.applyGain(*preLevel);
@@ -258,4 +246,14 @@ void GgconvolverAudioProcessor::setStateInformation (const void* data, int sizeI
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new GgconvolverAudioProcessor();
+}
+
+void GgconvolverAudioProcessor::updateCovolution() {
+ // Fetch from parameter
+    String irName = irChoice->getCurrentChoiceName();
+    currentIRLoaded = irChoice->getIndex();
+    int irSize;
+    const char* ir = BinaryData::getNamedResource(irName.toRawUTF8(), irSize);
+    convolution.reset();
+    convolution.loadImpulseResponse(ir, irSize, false, false, 0, true);
 }

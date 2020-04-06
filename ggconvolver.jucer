@@ -14,12 +14,14 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="rhiLQv" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
-    <FILE id="rgsbyO" name="MM-210-back-U906_44100Hz_200ms.wav" compile="0"
-          resource="1" file="Resources/MM-210-back-U906_44100Hz_200ms.wav"/>
-    <FILE id="jeFQyn" name="MM-210-offaxis-U906_44100Hz_200ms.wav" compile="0"
-          resource="1" file="Resources/MM-210-offaxis-U906_44100Hz_200ms.wav"/>
-    <FILE id="AWnnFL" name="MM-210-onaxis-U906_44100Hz_200ms.wav" compile="0"
-          resource="1" file="Resources/MM-210-onaxis-U906_44100Hz_200ms.wav"/>
+    <FILE id="TVi9N5" name="Celestion_V30_44100Hz_200ms.wav" compile="0"
+          resource="1" file="Resources/Celestion_V30_44100Hz_200ms.wav"/>
+    <FILE id="rgsbyO" name="MusicMan_210_back_44100Hz_200ms.wav" compile="0"
+          resource="1" file="Resources/MusicMan_210_back_44100Hz_200ms.wav"/>
+    <FILE id="jeFQyn" name="MusicMan_210_offaxis_44100Hz_200ms.wav" compile="0"
+          resource="1" file="Resources/MusicMan_210_offaxis_44100Hz_200ms.wav"/>
+    <FILE id="AWnnFL" name="MusicMan_210_onaxis_44100Hz_200ms.wav" compile="0"
+          resource="1" file="Resources/MusicMan_210_onaxis_44100Hz_200ms.wav"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019">
