@@ -66,7 +66,7 @@ public:
     //float postLevel = 0.0f;
 
 private:
-    void updateCovolution();
+    void updateConvolution();
     dsp::Convolution convolution;
     int currentIRLoaded = 0;
     //==============================================================================

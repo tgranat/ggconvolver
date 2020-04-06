@@ -48,7 +48,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
         "irChoice",
         "Speaker",
         irNames,
-        1));
+        0));
 
 }
 
@@ -130,9 +130,9 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
-    spec.numChannels = 1;
+    spec.numChannels = getTotalNumInputChannels();
     convolution.prepare(spec);
-    updateCovolution();
+    updateConvolution();
 }
 
 // Called when plugin removed (not when only disabled)
@@ -192,7 +192,7 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
 
     // Check if IR to use has been changed in GUI
     if (irChoice->getIndex() != currentIRLoaded) {
-        updateCovolution();
+        updateConvolution();
     }
 
     buffer.applyGain(*preLevel);
@@ -202,13 +202,13 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     convolution.process(context);
 
     buffer.applyGain(*postLevel);
-    
-    //for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    //{
-    //    auto* channelData = buffer.getWritePointer (channel);
+
+    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    {
+        auto* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
-    //}
+    }
 }
 
 //==============================================================================
@@ -248,12 +248,12 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new GgconvolverAudioProcessor();
 }
 
-void GgconvolverAudioProcessor::updateCovolution() {
+void GgconvolverAudioProcessor::updateConvolution() {
  // Fetch from parameter
     String irName = irChoice->getCurrentChoiceName();
     currentIRLoaded = irChoice->getIndex();
     int irSize;
     const char* ir = BinaryData::getNamedResource(irName.toRawUTF8(), irSize);
     convolution.reset();
-    convolution.loadImpulseResponse(ir, irSize, false, false, 0, true);
+    convolution.loadImpulseResponse(ir, irSize, true, false, 0, true);
 }
