@@ -117,6 +117,11 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 
+    //mOutLevel = 1.0;
+    // Set IR defaults
+    mIrNumber = 1;
+    String irName = BinaryData::namedResourceList[0];
+    mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), mIrSize);
     // Initialize convolution  
     dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
@@ -175,7 +180,7 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         buffer.clear (i, 0, buffer.getNumSamples());
 
     // Check if IR to use has been changed in GUI
-    if (mIrChoice->getIndex() != mCurrentIrLoaded) {
+    if (mIrNumber != mCurrentIrLoaded) {
         updateConvolution();
     }
 
@@ -185,7 +190,7 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     dsp::ProcessContextReplacing<float> context(block);
     mConvolution.process(context);
 
-    buffer.applyGain(*mPostLevel * Constant::compensatingOutGain);
+    buffer.applyGain(mOutLevel * Constant::compensatingOutGain);
 
      //for (int channel = 0; channel < totalNumInputChannels; ++channel)
     //{
@@ -203,8 +208,8 @@ bool GgconvolverAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* GgconvolverAudioProcessor::createEditor()
 {
-    //return new GgconvolverAudioProcessorEditor (*this);
-    return new GenericAudioProcessorEditor(*this);
+    return new GgconvolverAudioProcessorEditor (*this);
+    //return new GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -232,12 +237,9 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new GgconvolverAudioProcessor();
 }
 
+// Initiate/update convolution engine with parameters set by GUI
 void GgconvolverAudioProcessor::updateConvolution() {
- // Fetch from parameter
-    String irName = mIrChoice->getCurrentChoiceName();
-    mCurrentIrLoaded = mIrChoice->getIndex();
-    int ir1Size;
-    const char* ir1Data = BinaryData::getNamedResource(irName.toRawUTF8(), ir1Size);
+    mCurrentIrLoaded = mIrNumber;
     mConvolution.reset();
-    mConvolution.loadImpulseResponse(ir1Data, ir1Size, true, false, 0, true);
+    mConvolution.loadImpulseResponse(mIrData, mIrSize, true, false, 0, true);
 }

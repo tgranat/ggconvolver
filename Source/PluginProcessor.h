@@ -65,17 +65,20 @@ public:
     AudioParameterChoice* mIrChoice;
     AudioParameterFloat* mPostLevel;
  
-    //int menuChoice;
-    //float preLevel = 0.f;
-    //float postLevel = 0.0f;
+    // Parameters set by UI
+    float mOutLevel;
+    // IR data id
+    int mIrNumber;
+    // Size of IR
+    int mIrSize;
+    // IR data
+    const char* mIrData;
 
 private:
     void updateConvolution();
-
     
     dsp::Convolution mConvolution;
-    int mCurrentIrLoaded = 0;
-
+    int mCurrentIrLoaded = 1;
  
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GgconvolverAudioProcessor)

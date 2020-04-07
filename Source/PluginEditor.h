@@ -35,8 +35,8 @@ private:
     void comboBoxChanged(ComboBox* comboBox) override;
 
     ComboBox irChoice;
-    Slider preLevelSlider;
-    Label preLevelLabel;
+    //Slider preLevelSlider;
+    //Label preLevelLabel;
     Slider postLevelSlider;
     Label postLevelLabel;
 
