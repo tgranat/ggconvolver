@@ -12,6 +12,11 @@
 
 #include <JuceHeader.h>
 
+namespace Constant {
+    // Compensate for lost level in convolver. Seems to lose 50% in convolver.
+    // Increase the gain somewhat more so the perceived loudness sounds good (to me)
+    const float compensatingOutGain = 2.5;
+}
 //==============================================================================
 /**
 */
@@ -58,7 +63,6 @@ public:
     // UI parameters
  
     AudioParameterChoice* mIrChoice;
-    AudioParameterFloat* mPreLevel;
     AudioParameterFloat* mPostLevel;
  
     //int menuChoice;
@@ -68,6 +72,7 @@ public:
 private:
     void updateConvolution();
 
+    
     dsp::Convolution mConvolution;
     int mCurrentIrLoaded = 0;
 

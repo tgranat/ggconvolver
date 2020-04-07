@@ -25,16 +25,8 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
     )
 #endif
 {
-    addParameter(mPreLevel = new AudioParameterFloat("preLevel",
-        "Pre Level",
-        NormalisableRange<float>(0.1f, 2.f, 0.1f),
-        1.0f,
-        "dB",
-        AudioProcessorParameter::genericParameter,
-        [](float value, int) { return String(20 * log10(value), 1); }));
-
-    addParameter(mPostLevel = new AudioParameterFloat("postLevel",
-        "Post Level",
+     addParameter(mPostLevel = new AudioParameterFloat("postLevel",
+        "Out Level",
         NormalisableRange<float>(0.1f, 2.f, 0.1f),
         1.0f,
         "dB",
@@ -49,7 +41,6 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
         "Speaker",
         irNames,
         0));
-
 }
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
@@ -183,32 +174,25 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-
     // Check if IR to use has been changed in GUI
     if (mIrChoice->getIndex() != mCurrentIrLoaded) {
         updateConvolution();
     }
 
-    buffer.applyGain(*mPreLevel);
+    //float preRMSLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
 
     dsp::AudioBlock<float> block(buffer);
     dsp::ProcessContextReplacing<float> context(block);
     mConvolution.process(context);
 
-    buffer.applyGain(*mPostLevel);
+    buffer.applyGain(*mPostLevel * Constant::compensatingOutGain);
 
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+     //for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    //{
+   //     auto* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
-    }
+   // }
 }
 
 //==============================================================================
@@ -257,32 +241,3 @@ void GgconvolverAudioProcessor::updateConvolution() {
     mConvolution.reset();
     mConvolution.loadImpulseResponse(ir1Data, ir1Size, true, false, 0, true);
 }
-
-// Test. Blend two impulse responses and load in convolution engine.
-// 'blend' gives the weight of 'ir1' in the mix. For example 0.7 is 70% ir1 and 30% ir2
-// 'ir1' and 'ir2' are names of IR resources
-
-// For now, assume both IR same length
-/* not working like this
-void GgconvolverAudioProcessor::blendConvolution(String ir1, String ir2, float blend) {
-    int ir1Size;
-    const char* ir1Data = BinaryData::getNamedResource(ir1.toRawUTF8(), ir1Size);
-    int ir2Size;
-    const char* ir2Data = BinaryData::getNamedResource(ir2.toRawUTF8(), ir2Size);
-    std::vector<unsigned char> mix;
-    //std::vector<char> mix(ir1Data, ir1Data + ir1Size);
-    // many rows...to make sure I do it correctly
-    for (int i = 0; i < ir1Size; i++) {
-        int i1 = (int) ir1Data[i];
-        i1 = i1 * blend;  
-        int i2 = (int)ir2Data[i];
-        i2 = i2 * (1.f - blend);
-        int i3 = i1 + i2;
-        mix.push_back((unsigned char) i1);
-    }
-    
-    convolution.reset();
-    convolution.loadImpulseResponse(mix.data(), ir1Size, true, false, 0, true);
-
-}
-    */
