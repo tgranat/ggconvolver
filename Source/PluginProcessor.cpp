@@ -25,7 +25,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
     )
 #endif
 {
-    addParameter(preLevel = new AudioParameterFloat("preLevel",
+    addParameter(mPreLevel = new AudioParameterFloat("preLevel",
         "Pre Level",
         NormalisableRange<float>(0.1f, 2.f, 0.1f),
         1.0f,
@@ -33,7 +33,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
         AudioProcessorParameter::genericParameter,
         [](float value, int) { return String(20 * log10(value), 1); }));
 
-    addParameter(postLevel = new AudioParameterFloat("postLevel",
+    addParameter(mPostLevel = new AudioParameterFloat("postLevel",
         "Post Level",
         NormalisableRange<float>(0.1f, 2.f, 0.1f),
         1.0f,
@@ -44,7 +44,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
 
     StringArray irNames = StringArray(&BinaryData::namedResourceList[0], BinaryData::namedResourceListSize);
  
-    addParameter(irChoice = new AudioParameterChoice(
+    addParameter(mIrChoice = new AudioParameterChoice(
         "irChoice",
         "Speaker",
         irNames,
@@ -131,9 +131,9 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getTotalNumInputChannels();
-    convolution.prepare(spec);
+    mConvolution.prepare(spec);
     updateConvolution();
-}
+ }
 
 // Called when plugin removed (not when only disabled)
 // Also called during startup of plugin (at least on Reaper: first activate, then deactivate, then activate again) 
@@ -191,17 +191,17 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // interleaved by keeping the same state.
 
     // Check if IR to use has been changed in GUI
-    if (irChoice->getIndex() != currentIRLoaded) {
+    if (mIrChoice->getIndex() != mCurrentIrLoaded) {
         updateConvolution();
     }
 
-    buffer.applyGain(*preLevel);
+    buffer.applyGain(*mPreLevel);
 
     dsp::AudioBlock<float> block(buffer);
     dsp::ProcessContextReplacing<float> context(block);
-    convolution.process(context);
+    mConvolution.process(context);
 
-    buffer.applyGain(*postLevel);
+    buffer.applyGain(*mPostLevel);
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -250,10 +250,39 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void GgconvolverAudioProcessor::updateConvolution() {
  // Fetch from parameter
-    String irName = irChoice->getCurrentChoiceName();
-    currentIRLoaded = irChoice->getIndex();
-    int irSize;
-    const char* ir = BinaryData::getNamedResource(irName.toRawUTF8(), irSize);
-    convolution.reset();
-    convolution.loadImpulseResponse(ir, irSize, true, false, 0, true);
+    String irName = mIrChoice->getCurrentChoiceName();
+    mCurrentIrLoaded = mIrChoice->getIndex();
+    int ir1Size;
+    const char* ir1Data = BinaryData::getNamedResource(irName.toRawUTF8(), ir1Size);
+    mConvolution.reset();
+    mConvolution.loadImpulseResponse(ir1Data, ir1Size, true, false, 0, true);
 }
+
+// Test. Blend two impulse responses and load in convolution engine.
+// 'blend' gives the weight of 'ir1' in the mix. For example 0.7 is 70% ir1 and 30% ir2
+// 'ir1' and 'ir2' are names of IR resources
+
+// For now, assume both IR same length
+/* not working like this
+void GgconvolverAudioProcessor::blendConvolution(String ir1, String ir2, float blend) {
+    int ir1Size;
+    const char* ir1Data = BinaryData::getNamedResource(ir1.toRawUTF8(), ir1Size);
+    int ir2Size;
+    const char* ir2Data = BinaryData::getNamedResource(ir2.toRawUTF8(), ir2Size);
+    std::vector<unsigned char> mix;
+    //std::vector<char> mix(ir1Data, ir1Data + ir1Size);
+    // many rows...to make sure I do it correctly
+    for (int i = 0; i < ir1Size; i++) {
+        int i1 = (int) ir1Data[i];
+        i1 = i1 * blend;  
+        int i2 = (int)ir2Data[i];
+        i2 = i2 * (1.f - blend);
+        int i3 = i1 + i2;
+        mix.push_back((unsigned char) i1);
+    }
+    
+    convolution.reset();
+    convolution.loadImpulseResponse(mix.data(), ir1Size, true, false, 0, true);
+
+}
+    */
