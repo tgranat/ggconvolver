@@ -25,6 +25,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
     )
 #endif
 {
+    /*
      addParameter(mPostLevel = new AudioParameterFloat("postLevel",
         "Out Level",
         NormalisableRange<float>(0.1f, 2.f, 0.1f),
@@ -41,6 +42,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
         "Speaker",
         irNames,
         0));
+        */
 }
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
@@ -114,10 +116,14 @@ void GgconvolverAudioProcessor::changeProgramName (int index, const String& newN
 // Same as VST AudioEffect::setActive(1)
 void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    // Initiate filters
+    mLowShelfFilters[0].setCoefficients(IIRCoefficients::makeLowShelf(sampleRate, Constant::lowShelfFrequency, Constant::lowShelfFilterQ, 1.0));
+    mLowShelfFilters[1].setCoefficients(IIRCoefficients::makeLowShelf(sampleRate, Constant::lowShelfFrequency, Constant::lowShelfFilterQ, 1.0));
+    mCurrentLowShelfGain = 1.0;
+    mHighShelfFilters[0].setCoefficients(IIRCoefficients::makeHighShelf(sampleRate, Constant::highShelfFrequency, Constant::highShelfFilterQ, 1.0));
+    mHighShelfFilters[1].setCoefficients(IIRCoefficients::makeHighShelf(sampleRate, Constant::highShelfFrequency, Constant::highShelfFilterQ, 1.0));   
+    mCurrentHighShelfGain = 1.0;
 
-    //mOutLevel = 1.0;
     // Set IR defaults
     mIrNumber = 1;
     String irName = BinaryData::namedResourceList[0];
@@ -129,6 +135,7 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     spec.numChannels = getTotalNumInputChannels();
     mConvolution.prepare(spec);
     updateConvolution();
+    mCurrentIrLoaded = mIrNumber;
  }
 
 // Called when plugin removed (not when only disabled)
@@ -182,6 +189,7 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // Check if IR to use has been changed in GUI
     if (mIrNumber != mCurrentIrLoaded) {
         updateConvolution();
+        mCurrentIrLoaded = mIrNumber;
     }
 
     //float preRMSLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
@@ -190,8 +198,30 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     dsp::ProcessContextReplacing<float> context(block);
     mConvolution.process(context);
 
-    buffer.applyGain(mOutLevel * Constant::compensatingOutGain);
+    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+        mLowShelfFilters[channel].processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
+    }
+    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+        mHighShelfFilters[channel].processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
+    }
 
+    // add constant for freq and later a knob
+    if (mLowShelfGain != mCurrentLowShelfGain) {
+        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+            mLowShelfFilters[channel].setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
+        }
+        mCurrentLowShelfGain = mLowShelfGain;
+    }
+    if (mHighShelfGain != mCurrentHighShelfGain) {
+        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+            mHighShelfFilters[channel].setCoefficients(IIRCoefficients::makeHighShelf(getSampleRate(), Constant::highShelfFrequency, Constant::highShelfFilterQ, mHighShelfGain));
+        }
+        mCurrentHighShelfGain = mHighShelfGain;
+    }
+
+
+    buffer.applyGain(mOutLevel * Constant::compensatingOutGain);
+ 
      //for (int channel = 0; channel < totalNumInputChannels; ++channel)
     //{
    //     auto* channelData = buffer.getWritePointer (channel);
@@ -239,7 +269,6 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 // Initiate/update convolution engine with parameters set by GUI
 void GgconvolverAudioProcessor::updateConvolution() {
-    mCurrentIrLoaded = mIrNumber;
     mConvolution.reset();
     mConvolution.loadImpulseResponse(mIrData, mIrSize, true, false, 0, true);
 }

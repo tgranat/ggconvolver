@@ -11,50 +11,96 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+
 //==============================================================================
 GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p)
 {
-    getLookAndFeel().setColour(Slider::thumbColourId, Colours::red);
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
     setSize (300, 200);
 
-    //preLevelSlider.setRange(defaults::minSlider, defaults::maxSlider, defaults::sliderStep);
-    //pregainSlider.setSliderStyle(Slider::LinearVertical);
-    //preLevelSlider.addListener(this);
-    //preLevelSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-    //preLevelSlider.setTextValueSuffix(" dB");
-    //addAndMakeVisible(preLevelSlider);
-    //preLevelLabel.setText("Pre Level", dontSendNotification);
-    //preLevelLabel.attachToComponent(&preLevelSlider, true);
-    //addAndMakeVisible(preLevelLabel);
+    // LEVEL SLIDER
+    levelSlider.setSliderStyle(Slider::RotaryVerticalDrag);
+    levelSlider.setRange(0.f, 3.f, 0.01);
+    levelSlider.setValue(1.0);
+    // Sets mid point to middle of slider even though 1.0 not is in the middle of the range
+    levelSlider.setSkewFactorFromMidPoint(1.0);
+    // Don't show text box with values
+    levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    levelSlider.addListener(this);
+    // Set customized look and feel
+    levelSliderLookAndFeel.setColour(SliderLookAndFeel::ColourTarget::tip, Colours::blue);
+    levelSliderLookAndFeel.setColour(SliderLookAndFeel::ColourTarget::top, Colours::grey);
 
-    //postLevelSlider.setRange(defaults::minSlider, defaults::maxSlider, defaults::sliderStep);
-    //postLevelSlider.setSliderStyle(Slider::Rotary);
-    postLevelSlider.setRange(0.f, 3.f, 0.01);
-    postLevelSlider.setValue(1.0);
-    postLevelSlider.setSkewFactorFromMidPoint(1.0);
-    postLevelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    postLevelSlider.addListener(this);
-    //postLevelSlider.setTextValueSuffix(" dB");
-    addAndMakeVisible(postLevelSlider);
+    levelSlider.setLookAndFeel(&levelSliderLookAndFeel);
+    addAndMakeVisible(levelSlider);
 
+    // LEVEL LABEL
     //postLevelLabel.setFont(Font(15.0f, Font::bold));
-    postLevelLabel.setText("Level", dontSendNotification);
-    postLevelLabel.attachToComponent(&postLevelSlider, false);
-    addAndMakeVisible(postLevelLabel);
+    levelLabel.setFont(Font("Ariel", 13.0f, Font::plain));
+    levelLabel.setText("Level", dontSendNotification);
+    levelLabel.setJustificationType(Justification::centredTop);
+    levelLabel.attachToComponent(&levelSlider, false);
+    addAndMakeVisible(levelLabel);
 
-    //StringArray irNames = StringArray(&BinaryData::namedResourceList[0], BinaryData::namedResourceListSize);
+    // LOW SHELF SLIDER
+    lowSlider.setSliderStyle(Slider::RotaryVerticalDrag);
+    // Filter doesn't like gain = 0.0
+    lowSlider.setRange(0.05f, 2.f, 0.01);
+    lowSlider.setValue(1.0);
+    // Sets mid point to middle of slider even though 1.0 not is in the middle of the range
+    levelSlider.setSkewFactorFromMidPoint(1.0);
+    // Don't show text box with values
+    lowSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    //lowSlider.setTextBoxStyle(Slider::TextBoxLeft, true, 40, 40);
+    lowSlider.addListener(this);
+    // Set customized look and feel
+    lowSliderLookAndFeel.setColour(SliderLookAndFeel::ColourTarget::tip, Colours::yellow);
+    lowSliderLookAndFeel.setColour(SliderLookAndFeel::ColourTarget::top, Colours::grey);
 
+    lowSlider.setLookAndFeel(&lowSliderLookAndFeel);
+    addAndMakeVisible(lowSlider);
+
+    // LOW SHELF LABEL
+    //postLevelLabel.setFont(Font(15.0f, Font::bold));
+    lowLabel.setFont(Font("Ariel", 13.0f, Font::plain));
+    lowLabel.setText("Low", dontSendNotification);
+    lowLabel.setJustificationType(Justification::centredTop);
+    lowLabel.attachToComponent(&lowSlider, false);
+    addAndMakeVisible(lowLabel);
+
+    // HIGH SHELF SLIDER
+    highSlider.setSliderStyle(Slider::RotaryVerticalDrag);
+    highSlider.setRange(0.05f, 2.f, 0.01);
+    highSlider.setValue(1.0);
+    // Sets mid point to middle of slider even though 1.0 not is in the middle of the range
+    levelSlider.setSkewFactorFromMidPoint(1.0);
+    // Don't show text box with values
+    highSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    highSlider.addListener(this);
+    // Set customized look and feel
+    highSlider.setColour(SliderLookAndFeel::ColourTarget::tip, Colours::yellow);
+    highSlider.setColour(SliderLookAndFeel::ColourTarget::top, Colours::grey);
+
+    highSlider.setLookAndFeel(&lowSliderLookAndFeel);
+    addAndMakeVisible(highSlider);
+
+    // HIGH SHELF LABEL
+    //postLevelLabel.setFont(Font(15.0f, Font::bold));
+    highLabel.setFont(Font("Ariel", 13.0f, Font::plain));
+    highLabel.setText("High", dontSendNotification);
+    highLabel.setJustificationType(Justification::centredTop);
+    highLabel.attachToComponent(&highSlider, false);
+    addAndMakeVisible(highLabel);
+
+    // SPEAKER CHOICE DROPDOWN
+    // Populate from resources in BinaryData
     for (int i = 0; i < BinaryData::namedResourceListSize; i++) {
         irChoice.addItem(BinaryData::namedResourceList[i], i+1);
     }
     
     irChoice.setSelectedId(1);
     irChoice.addListener(this);
-    addAndMakeVisible(irChoice);
-    
+    addAndMakeVisible(irChoice);   
 }
 
 GgconvolverAudioProcessorEditor::~GgconvolverAudioProcessorEditor()
@@ -72,26 +118,40 @@ void GgconvolverAudioProcessorEditor::paint (Graphics& g)
     g.setFont (15.0f);
     g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
     */
-    g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
+    //g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
+
+    g.setColour(Colours::white);
+    g.setFont(Font("Ariel", 15.0f, Font::bold));
+    g.drawFittedText("Simple Speaker Simulator", 0, 0, getWidth(), 30, Justification::centred, 1);
 
  }
 
 void GgconvolverAudioProcessorEditor::resized()
 {
-    auto sliderLeft = 10;
-    //preLevelSlider.setBounds(sliderLeft, 20, getWidth() - sliderLeft - 10, 20);
-    postLevelSlider.setBounds(sliderLeft, 30, getWidth() - sliderLeft - 10, 20);
-    irChoice.setBounds(sliderLeft, 70, getWidth() - sliderLeft - 10, 20);
+    int sliderLeft = 10;
+    int sliderRow = 60;
+    int w = 50;
+    int h = 50;
+    levelSlider.setBounds(sliderLeft, sliderRow, w, h);
+    lowSlider.setBounds(sliderLeft + w, sliderRow, w, h);
+    highSlider.setBounds(sliderLeft + 2*w, sliderRow, w, h);
+    irChoice.setBounds(sliderLeft, sliderRow + 70, getWidth() - sliderLeft - 10, 20);
     //irChoice.setBounds(50, 90, 200, 50);
-    //pregainSlider.setBounds(40, 30, 20, getHeight() - 60);
+   
 }
 void GgconvolverAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
-    // Need to convert dB to gain
-    if (&postLevelSlider == slider) {
+    if (&levelSlider == slider) {
         //processor.mOutLevel = (float)Decibels::decibelsToGain(postLevelSlider.getValue());
-        processor.mOutLevel = postLevelSlider.getValue();
+        processor.mOutLevel = levelSlider.getValue();
     }
+    if (&lowSlider == slider) {
+        processor.mLowShelfGain = lowSlider.getValue();
+    }
+    if (&highSlider == slider) {
+        processor.mHighShelfGain = highSlider.getValue();
+    }
+
 }
 
 void GgconvolverAudioProcessorEditor::comboBoxChanged(ComboBox* comboBox)

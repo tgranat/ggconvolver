@@ -16,6 +16,11 @@ namespace Constant {
     // Compensate for lost level in convolver. Seems to lose 50% in convolver.
     // Increase the gain somewhat more so the perceived loudness sounds good (to me)
     const float compensatingOutGain = 2.5;
+
+    const float lowShelfFilterQ = 1.41;
+    const float lowShelfFrequency = 200.f;
+    const float highShelfFilterQ = 1.41;
+    const float highShelfFrequency = 4000.f;
 }
 //==============================================================================
 /**
@@ -62,11 +67,16 @@ public:
 
     // UI parameters
  
-    AudioParameterChoice* mIrChoice;
-    AudioParameterFloat* mPostLevel;
+    //AudioParameterChoice* mIrChoice;
+    //AudioParameterFloat* mPostLevel;
  
     // Parameters set by UI
+    // Level gain
     float mOutLevel;
+    // Low shelving filter gain
+    float mLowShelfGain;
+    // High shelving filter gain
+    float mHighShelfGain;
     // IR data id
     int mIrNumber;
     // Size of IR
@@ -78,7 +88,14 @@ private:
     void updateConvolution();
     
     dsp::Convolution mConvolution;
+    IIRFilter mLowShelfFilters[2];
+    IIRFilter mHighShelfFilters[2];
+    //IIRFilter mLowShelfFilter1;
+    //IIRFilter mLowShelfFilter2;
+
     int mCurrentIrLoaded = 1;
+    float mCurrentLowShelfGain = 1.f;
+    float mCurrentHighShelfGain = 1.f;
  
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GgconvolverAudioProcessor)
