@@ -123,6 +123,11 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     mHighShelfFilters[0].setCoefficients(IIRCoefficients::makeHighShelf(sampleRate, Constant::highShelfFrequency, Constant::highShelfFilterQ, 1.0));
     mHighShelfFilters[1].setCoefficients(IIRCoefficients::makeHighShelf(sampleRate, Constant::highShelfFrequency, Constant::highShelfFilterQ, 1.0));   
     mCurrentHighShelfGain = 1.0;
+    mMidPeakFilters[0].setCoefficients(IIRCoefficients::makePeakFilter(sampleRate, Constant::midPeakFrequency, Constant::midPeakFilterQ, 1.0));
+    mMidPeakFilters[1].setCoefficients(IIRCoefficients::makePeakFilter(sampleRate, Constant::midPeakFrequency, Constant::midPeakFilterQ, 1.0));
+    mCurrentMidPeakFrequency = Constant::midPeakFrequency;
+    mCurrentMidPeakQ = Constant::midPeakFilterQ;
+    mCurrentMidPeakGain = 1.0f;
 
     // Set IR defaults
     mIrNumber = 1;
@@ -199,14 +204,12 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     mConvolution.process(context);
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel) {
-        mLowShelfFilters[channel].processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
-    }
-    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
-        mHighShelfFilters[channel].processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
+        mLowShelfFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
+        mMidPeakFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
+        mHighShelfFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
     }
 
-    // add constant for freq and later a knob
-    if (mLowShelfGain != mCurrentLowShelfGain) {
+     if (mLowShelfGain != mCurrentLowShelfGain) {
         for (int channel = 0; channel < totalNumInputChannels; ++channel) {
             mLowShelfFilters[channel].setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
         }
@@ -219,15 +222,16 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         mCurrentHighShelfGain = mHighShelfGain;
     }
 
+    if (mMidPeakFrequency != mCurrentMidPeakFrequency || mMidPeakQ != mCurrentMidPeakQ || mMidPeakGain != mCurrentMidPeakGain) {
+        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+            mMidPeakFilters[channel].setCoefficients(IIRCoefficients::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain));
+        }
+        mCurrentMidPeakFrequency = mMidPeakFrequency;
+        mCurrentMidPeakQ = mMidPeakQ;
+        mCurrentMidPeakGain = mMidPeakGain;
+    }
 
     buffer.applyGain(mOutLevel * Constant::compensatingOutGain);
- 
-     //for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    //{
-   //     auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-   // }
 }
 
 //==============================================================================

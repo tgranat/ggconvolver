@@ -147,7 +147,7 @@ private:
 
     void sliderValueChanged(Slider* slider) override;
     void comboBoxChanged(ComboBox* comboBox) override;
-    void updateToggleState(Button* button, float midPeakQ);
+    void updateToggleState(float midPeakQ);
 
     MyLookAndFeel basicLookAndFeel;
     MyLookAndFeel lowSliderLookAndFeel;

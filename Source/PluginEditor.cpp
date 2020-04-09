@@ -40,13 +40,10 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     // Don't show text box with values
     levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     levelSlider.addListener(this);
-    // Set customized look and feel
- 
     levelSlider.setLookAndFeel(&basicLookAndFeel);
     addAndMakeVisible(levelSlider);
 
     // LEVEL LABEL
-    //postLevelLabel.setFont(Font(15.0f, Font::bold));
     levelLabel.setFont(controlFont);
     levelLabel.setText("Level", dontSendNotification);
     levelLabel.setJustificationType(Justification::centredBottom);
@@ -60,15 +57,12 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     lowSlider.setValue(1.f);
     // Don't show text box with values
     lowSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    lowSlider.setPopupDisplayEnabled(true, false, this);
+    //lowSlider.setPopupDisplayEnabled(true, false, this);
     lowSlider.addListener(this);
-    // Set customized look and feel
-
     lowSlider.setLookAndFeel(&lowSliderLookAndFeel);
     addAndMakeVisible(lowSlider);
 
     // LOW SHELF LABEL
-    //postLevelLabel.setFont(Font(15.0f, Font::bold));
     lowLabel.setFont(controlFont);
     lowLabel.setText("Low", dontSendNotification);
     lowLabel.setJustificationType(Justification::centredBottom);
@@ -79,17 +73,14 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     midSlider.setSliderStyle(Slider::RotaryVerticalDrag);
     midSlider.setRange(0.05f, 1.95f, 0.01);
     midSlider.setValue(1.f);
-    // Sets mid point to middle of slider even though 1.0 not is in the middle of the range
-    //levelSlider.setSkewFactorFromMidPoint(1.0);
     // Don't show text box with values
     midSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     midSlider.addListener(this);
-    midSlider.setPopupDisplayEnabled(true, false, this);
+    //midSlider.setPopupDisplayEnabled(true, false, this);
     midSlider.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midSlider);
 
     // MID PEAK LABEL
-    //postLevelLabel.setFont(Font(15.0f, Font::bold));
     midLabel.setFont(controlFont);
     midLabel.setText("Mid", dontSendNotification);
     midLabel.setJustificationType(Justification::centredBottom);
@@ -100,19 +91,15 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     midFrequency.setSliderStyle(Slider::RotaryVerticalDrag);
     midFrequency.setRange(200.f, 4000.f, 1.f);
     midFrequency.setValue(2100.f);
-    // Sets mid point to middle of slider even though 1.0 not is in the middle of the range
-    //levelSlider.setSkewFactorFromMidPoint(1.0);
     // Don't show text box with values
     midFrequency.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     midFrequency.addListener(this);
-    // Set customized look and feel
     midFrequency.setPopupDisplayEnabled(true, false, this);
     midFrequency.setTextValueSuffix(" Hz");
     midFrequency.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midFrequency);
 
     // MID FREQUENCY LABEL
-    //postLevelLabel.setFont(Font(15.0f, Font::bold));
     midFrequencyLabel.setFont(controlFont);
     midFrequencyLabel.setText("Freq", dontSendNotification);
     midFrequencyLabel.setJustificationType(Justification::centredBottom);
@@ -122,15 +109,16 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     // MID BANDWIDTH BUTTONS
     midBw2OctButton.setClickingTogglesState(true);
     midBw2OctButton.setRadioGroupId(101);
-    midBw2OctButton.onClick = [this] { GgconvolverAudioProcessorEditor::updateToggleState(&midBw2OctButton, 0.667f); };
+    midBw2OctButton.onClick = [this] { GgconvolverAudioProcessorEditor::updateToggleState(0.667f); };
     // Set this button as default on at startup
     midBw2OctButton.setToggleState(true, false);
+    GgconvolverAudioProcessorEditor::updateToggleState(0.667f);
     midBw2OctButton.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midBw2OctButton);
 
     midBw1OctButton.setClickingTogglesState(true);
     midBw1OctButton.setRadioGroupId(101);
-    midBw1OctButton.onClick = [this] { GgconvolverAudioProcessorEditor::updateToggleState(&midBw1OctButton, 1.141f); };
+    midBw1OctButton.onClick = [this] { GgconvolverAudioProcessorEditor::updateToggleState(1.141f); };
     addAndMakeVisible(midBw1OctButton);
     midBwLabel.setFont(controlFont);
     midBwLabel.setText("BW", dontSendNotification);
@@ -252,6 +240,12 @@ void GgconvolverAudioProcessorEditor::sliderValueChanged(Slider* slider)
     if (&highSlider == slider) {
         processor.mHighShelfGain = highSlider.getValue();
     }
+    if (&midSlider == slider) {
+        processor.mMidPeakGain = midSlider.getValue();
+    }
+    if (&midFrequency == slider) {
+        processor.mMidPeakFrequency = midFrequency.getValue();
+    }
 
 }
 
@@ -263,7 +257,7 @@ void GgconvolverAudioProcessorEditor::comboBoxChanged(ComboBox* comboBox)
     processor.mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), processor.mIrSize);
 
 }
-void GgconvolverAudioProcessorEditor::updateToggleState(Button* button, float midPeakQ) {
+void GgconvolverAudioProcessorEditor::updateToggleState(float midPeakQ) {
     processor.mMidPeakQ = midPeakQ;
 }
 
