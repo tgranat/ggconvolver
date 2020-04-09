@@ -176,6 +176,27 @@ GgconvolverAudioProcessorEditor::~GgconvolverAudioProcessorEditor()
 {
 }
 
+void GgconvolverAudioProcessorEditor::paintFrame(float sx, float sy, Graphics& g) {
+    Path path;
+    path.startNewSubPath(sx + 5, sy - 10);
+    path.lineTo(sx, sy - 10);
+    path.lineTo(sx, sy + 55);
+    path.startNewSubPath(sx + 50, sy + 55);
+    path.lineTo(sx + 50, sy - 10);
+    path.lineTo(sx + 45, sy - 10);
+    g.strokePath(path, PathStrokeType(2.0f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::square));
+}
+
+void GgconvolverAudioProcessorEditor::paintFrameHalf(float sx, float sy, Graphics& g) {
+    Path path;
+    path.startNewSubPath(sx + 5, sy - 10);
+    path.lineTo(sx - 20, sy - 10);
+    path.lineTo(sx - 20, sy + 55);
+    path.startNewSubPath(sx + 45, sy - 10);
+    path.lineTo(sx + 70, sy - 10);
+    path.lineTo(sx + 70, sy + 55);
+    g.strokePath(path, PathStrokeType(2.0f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::square));
+}
 //==============================================================================
 void GgconvolverAudioProcessorEditor::paint (Graphics& g)
 {
@@ -193,23 +214,27 @@ void GgconvolverAudioProcessorEditor::paint (Graphics& g)
     g.setFont(Font("Ariel", 15.0f, Font::bold));
     g.drawFittedText("Simple Speaker Simulator", 0, 0, getWidth(), 30, Justification::centred, 1);
 
+    paintFrame(10, 50, g);
+    paintFrame(10 + 60, 50, g);
+    paintFrame(10 + 220, 50, g);
+    paintFrameHalf(10 + 140, 50, g);
  }
 
 void GgconvolverAudioProcessorEditor::resized()
 {
     int sliderLeft = 10;
     int sliderRow = 50;
-    int w = 70;
+    int w = 50;
     int h = 50;
     levelSlider.setBounds(sliderLeft, sliderRow, w, h);
-    lowSlider.setBounds(sliderLeft + w, sliderRow, w, h);
-    midSlider.setBounds(sliderLeft + 2*w, sliderRow, w, h);
-    highSlider.setBounds(sliderLeft + 3*w, sliderRow, w, h);
+    lowSlider.setBounds(sliderLeft + 60, sliderRow, w, h);
+    midSlider.setBounds(sliderLeft + 140, sliderRow, w, h);
+    highSlider.setBounds(sliderLeft + 220, sliderRow, w, h);
 
-    midFrequency.setBounds(sliderLeft + 2 * w - 30, sliderRow + 60, w, h);
+    midFrequency.setBounds(sliderLeft + 117, sliderRow + 60, w, h);
 
-    midBw1OctButton.setBounds(sliderLeft + 2 * w + 30, sliderRow + 60, 50, 18);
-    midBw2OctButton.setBounds(sliderLeft + 2 * w + 30, sliderRow + 85, 50, 18);
+    midBw1OctButton.setBounds(sliderLeft + 165, sliderRow + 60, 40, 18);
+    midBw2OctButton.setBounds(sliderLeft + 165, sliderRow + 85, 40, 18);
 
     irChoice.setBounds(sliderLeft, sliderRow + 120, getWidth() - sliderLeft - 10, 20);
     //irChoice.setBounds(50, 90, 200, 50);

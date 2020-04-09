@@ -142,6 +142,9 @@ public:
     void resized() override;
 
 private:
+    void paintFrame(float x, float y, Graphics& g);
+    void paintFrameHalf(float x, float y, Graphics& g);
+
     void sliderValueChanged(Slider* slider) override;
     void comboBoxChanged(ComboBox* comboBox) override;
     void updateToggleState(Button* button, float midPeakQ);
