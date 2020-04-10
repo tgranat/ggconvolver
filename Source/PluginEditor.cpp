@@ -137,7 +137,7 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     // Don't show text box with values
     highSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     highSlider.addListener(this);
-    highSlider.setPopupDisplayEnabled(true, false, this);
+    //highSlider.setPopupDisplayEnabled(true, false, this);
     highSlider.setLookAndFeel(&lowSliderLookAndFeel);
     addAndMakeVisible(highSlider);
 

@@ -22,6 +22,8 @@
           resource="1" file="Resources/MusicMan_210_offaxis_44100Hz_200ms.wav"/>
     <FILE id="AWnnFL" name="MusicMan_210_onaxis_44100Hz_200ms.wav" compile="0"
           resource="1" file="Resources/MusicMan_210_onaxis_44100Hz_200ms.wav"/>
+    <FILE id="bobsY7" name="Ampeg V4-B_44100Hz.wav" compile="0" resource="1"
+          file="Resources/Ampeg V4-B_44100Hz.wav"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019">
