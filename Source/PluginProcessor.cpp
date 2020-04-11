@@ -16,13 +16,13 @@
 GgconvolverAudioProcessor::GgconvolverAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
     : AudioProcessor(BusesProperties()
-#if ! JucePlugin_IsMidiEffect
-#if ! JucePlugin_IsSynth
-        .withInput("Input", AudioChannelSet::stereo(), true)
-#endif
-        .withOutput("Output", AudioChannelSet::stereo(), true)
-#endif
-    )
+         #if ! JucePlugin_IsMidiEffect
+             #if ! JucePlugin_IsSynth
+              .withInput("Input", AudioChannelSet::stereo(), true)
+             #endif
+              .withOutput("Output", AudioChannelSet::stereo(), true)
+         #endif
+              ), mAPVTS(*this, nullptr, "PARAMETERS", createParameters())
 #endif
 {
     /*
@@ -275,4 +275,16 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 void GgconvolverAudioProcessor::updateConvolution() {
     mConvolution.reset();
     mConvolution.loadImpulseResponse(mIrData, mIrSize, true, false, 0, true);
+}
+
+AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createParameters() {
+    std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
+    parameters.push_back(std::make_unique<AudioParameterFloat>("LEVEL", "Level", NormalisableRange<float>(0.0, 3.0, 0.01, 1.0, true), 1.0));
+    parameters.push_back(std::make_unique<AudioParameterFloat>("LOW", "Low", 0.05f, 1.95f, 1.0f));
+    parameters.push_back(std::make_unique<AudioParameterFloat>("MID", "Mid", 0.05f, 1.95f, 1.0f));
+    parameters.push_back(std::make_unique<AudioParameterFloat>("HIGH", "High", 0.05f, 1.95f, 1.0f));
+    parameters.push_back(std::make_unique<AudioParameterFloat>("MID FREQ", "Mid Freq", 200.f, 4000.f, 2100.f));
+    parameters.push_back(std::make_unique<AudioParameterChoice>("BANDWIDTH", "Bandwidth", StringArray({ "1 oct.", "2 oct."}), 0));
+
+    return { parameters.begin(), parameters.end() };
 }

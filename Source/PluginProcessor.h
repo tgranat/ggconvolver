@@ -69,10 +69,6 @@ public:
 
     // UI parameters
  
-    //AudioParameterChoice* mIrChoice;
-    //AudioParameterFloat* mPostLevel;
- 
-    // Parameters set by UI
     // Level gain
     float mOutLevel;
     // Low shelving filter gain
@@ -95,7 +91,11 @@ public:
 private:
     void updateConvolution();
     
+    AudioProcessorValueTreeState mAPVTS;
+    AudioProcessorValueTreeState::ParameterLayout createParameters();
+
     dsp::Convolution mConvolution;
+
     IIRFilter mLowShelfFilters[2];
     IIRFilter mMidPeakFilters[2];
     IIRFilter mHighShelfFilters[2];
