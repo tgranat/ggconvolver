@@ -131,8 +131,7 @@ public:
  };
 
 
-class GgconvolverAudioProcessorEditor  : public AudioProcessorEditor,
-    private Slider::Listener, ComboBox::Listener
+class GgconvolverAudioProcessorEditor  : public AudioProcessorEditor
 {
 public:
     GgconvolverAudioProcessorEditor (GgconvolverAudioProcessor&);
@@ -145,8 +144,8 @@ private:
     void paintFrame(float x, float y, Graphics& g);
     void paintFrameHalf(float x, float y, Graphics& g);
 
-    void sliderValueChanged(Slider* slider) override;
-    void comboBoxChanged(ComboBox* comboBox) override;
+    //void sliderValueChanged(Slider* slider) override;
+    //void comboBoxChanged(ComboBox* comboBox) override;
     void updateToggleState(float midPeakQ);
 
     MyLookAndFeel basicLookAndFeel;
@@ -158,7 +157,7 @@ private:
     Slider lowSlider;
     Slider highSlider;
     Slider midSlider;
-    Slider midFrequency;
+    Slider midFrequencySlider;
     Label levelLabel;
     Label lowLabel;
     Label highLabel;
@@ -167,6 +166,15 @@ private:
     Label midBwLabel;
     TextButton midBw2OctButton { "2 oct." };
     TextButton midBw1OctButton{ "1 oct." };
+
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mLevelAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mLowAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mMidAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mHighAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mMidFreqencyAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> mIrChoiceAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth1Attachement;
+    std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth2Attachement;
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

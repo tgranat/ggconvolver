@@ -15,7 +15,7 @@
 namespace Constant {
     // Compensate for lost level in convolver. Seems to lose 50% in convolver.
     // Increase the gain somewhat more so the perceived loudness sounds good (to me)
-    const float compensatingOutGain = 2.5;
+    const float compensatingOutGain = 1.5;
 
     const float lowShelfFilterQ = 1.41; // 1 octave = 1.41   2 octave = 0.667
     const float lowShelfFrequency = 200.f;
@@ -79,6 +79,9 @@ public:
     float mMidPeakFrequency;
     // Mid peak q
     float mMidPeakQ;
+    // New:
+    bool mBandwidth1;
+    bool mBandwidth2;
     // High shelving filter gain
     float mHighShelfGain;
     // IR data id
@@ -88,12 +91,14 @@ public:
     // IR data
     const char* mIrData;
 
+    AudioProcessorValueTreeState& getAPVTS() { return mAPVTS; }
+
 private:
     void updateConvolution();
     
     AudioProcessorValueTreeState mAPVTS;
     AudioProcessorValueTreeState::ParameterLayout createParameters();
-
+    void updateParams();
     dsp::Convolution mConvolution;
 
     IIRFilter mLowShelfFilters[2];

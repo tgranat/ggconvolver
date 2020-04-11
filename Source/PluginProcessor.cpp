@@ -191,6 +191,9 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    // Improve this later. All params always updated every time now
+    updateParams();
+
     // Check if IR to use has been changed in GUI
     if (mIrNumber != mCurrentIrLoaded) {
         updateConvolution();
@@ -279,12 +282,51 @@ void GgconvolverAudioProcessor::updateConvolution() {
 
 AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createParameters() {
     std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
-    parameters.push_back(std::make_unique<AudioParameterFloat>("LEVEL", "Level", NormalisableRange<float>(0.0, 3.0, 0.01, 1.0, true), 1.0));
+    parameters.push_back(std::make_unique<AudioParameterFloat>("LEVEL", "Level", 0.0, 3.0, 1.5));
     parameters.push_back(std::make_unique<AudioParameterFloat>("LOW", "Low", 0.05f, 1.95f, 1.0f));
     parameters.push_back(std::make_unique<AudioParameterFloat>("MID", "Mid", 0.05f, 1.95f, 1.0f));
     parameters.push_back(std::make_unique<AudioParameterFloat>("HIGH", "High", 0.05f, 1.95f, 1.0f));
     parameters.push_back(std::make_unique<AudioParameterFloat>("MID FREQ", "Mid Freq", 200.f, 4000.f, 2100.f));
-    parameters.push_back(std::make_unique<AudioParameterChoice>("BANDWIDTH", "Bandwidth", StringArray({ "1 oct.", "2 oct."}), 0));
+    parameters.push_back(std::make_unique<AudioParameterBool>("BANDWIDTH1", "BW 1 oct", false));
+    parameters.push_back(std::make_unique<AudioParameterBool>("BANDWIDTH2", "BW 2 oct", true));
+
+    //for (int i = 0; i < BinaryData::namedResourceListSize; i++) {
+    //    irChoices.add(BinaryData::namedResourceList[i]);
+    //}
+    // ComboBox populated in editor.
+    parameters.push_back(std::make_unique<AudioParameterChoice>("IRCHOICE", "IR Choice", StringArray(), 0));
+
+
 
     return { parameters.begin(), parameters.end() };
+}
+
+// update all paramsfrom gui. Need to change this later. All params including reading the IR data is done every time
+void GgconvolverAudioProcessor::updateParams() {
+    // Level gain
+    mOutLevel = mAPVTS.getRawParameterValue("LEVEL")->load();
+    // Low shelving filter gain
+    mLowShelfGain = mAPVTS.getRawParameterValue("LOW")->load();
+    // Mid peak gain
+    mMidPeakGain = mAPVTS.getRawParameterValue("MID")->load();
+    // Mid peak frequency
+    mMidPeakFrequency = mAPVTS.getRawParameterValue("MID FREQ")->load();
+    // Mid peak q
+    // May change this
+    mBandwidth1 = mAPVTS.getRawParameterValue("BANDWIDTH1")->load();
+    mBandwidth2 = mAPVTS.getRawParameterValue("BANDWIDTH2")->load();
+    if (mBandwidth1) mMidPeakQ = 1.141;
+    if (mBandwidth2) mMidPeakQ = 0.667;
+    // High shelving filter gain
+    mHighShelfGain = mAPVTS.getRawParameterValue("HIGH")->load();
+    // IR data id
+    mIrNumber = mAPVTS.getRawParameterValue("IRCHOICE")->load();
+    // Size of IR
+    int mIrSize;
+    String irName = BinaryData::namedResourceList[mIrNumber];
+    mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), mIrSize);
+
+
+    // IR data
+    const char* mIrData;
 }

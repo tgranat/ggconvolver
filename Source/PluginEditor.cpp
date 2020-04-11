@@ -33,15 +33,18 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     
     // LEVEL SLIDER
     levelSlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    levelSlider.setRange(0.f, 3.f, 0.01);
-    levelSlider.setValue(1.0);
+    //levelSlider.setRange(0.f, 3.f, 0.01);
+    //levelSlider.setValue(1.0);
     // Sets mid point to middle of slider even though 1.0 not is in the middle of the range
-    levelSlider.setSkewFactorFromMidPoint(1.0);
+    //levelSlider.setSkewFactorFromMidPoint(1.0);
     // Don't show text box with values
     levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    levelSlider.addListener(this);
+    levelSlider.setPopupDisplayEnabled(true, false, this);
+    //levelSlider.addListener(this);
     levelSlider.setLookAndFeel(&basicLookAndFeel);
     addAndMakeVisible(levelSlider);
+    mLevelAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "LEVEL", levelSlider);
+
 
     // LEVEL LABEL
     levelLabel.setFont(controlFont);
@@ -53,14 +56,15 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     // LOW SHELF SLIDER
     lowSlider.setSliderStyle(Slider::RotaryVerticalDrag);
     // Filter doesn't like gain = 0.0
-    lowSlider.setRange(0.05f, 1.95f, 0.01);
-    lowSlider.setValue(1.f);
+    //lowSlider.setRange(0.05f, 1.95f, 0.01);
+    //lowSlider.setValue(1.f);
     // Don't show text box with values
     lowSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     //lowSlider.setPopupDisplayEnabled(true, false, this);
-    lowSlider.addListener(this);
+    //lowSlider.addListener(this);
     lowSlider.setLookAndFeel(&lowSliderLookAndFeel);
     addAndMakeVisible(lowSlider);
+    mLowAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "LOW", lowSlider);
 
     // LOW SHELF LABEL
     lowLabel.setFont(controlFont);
@@ -71,14 +75,15 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
 
     // MID PEAK SLIDER
     midSlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    midSlider.setRange(0.05f, 1.95f, 0.01);
-    midSlider.setValue(1.f);
+    //midSlider.setRange(0.05f, 1.95f, 0.01);
+   // midSlider.setValue(1.f);
     // Don't show text box with values
     midSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    midSlider.addListener(this);
+   // midSlider.addListener(this);
     //midSlider.setPopupDisplayEnabled(true, false, this);
     midSlider.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midSlider);
+    mMidAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "MID", midSlider);
 
     // MID PEAK LABEL
     midLabel.setFont(controlFont);
@@ -88,22 +93,23 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     addAndMakeVisible(midLabel);
 
     // MID FREQUENCY SLIDER
-    midFrequency.setSliderStyle(Slider::RotaryVerticalDrag);
-    midFrequency.setRange(200.f, 4000.f, 1.f);
-    midFrequency.setValue(2100.f);
+    midFrequencySlider.setSliderStyle(Slider::RotaryVerticalDrag);
+    //midFrequencySlider.setRange(200.f, 4000.f, 1.f);
+    //midFrequencySlider.setValue(2100.f);
     // Don't show text box with values
-    midFrequency.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    midFrequency.addListener(this);
-    midFrequency.setPopupDisplayEnabled(true, false, this);
-    midFrequency.setTextValueSuffix(" Hz");
-    midFrequency.setLookAndFeel(&freqSliderLookAndFeel);
-    addAndMakeVisible(midFrequency);
+    midFrequencySlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    //midFrequency.addListener(this);
+    midFrequencySlider.setPopupDisplayEnabled(true, false, this);
+    midFrequencySlider.setTextValueSuffix(" Hz");
+    midFrequencySlider.setLookAndFeel(&freqSliderLookAndFeel);
+    addAndMakeVisible(midFrequencySlider);
+    mMidFreqencyAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "MID FREQ", midFrequencySlider);
 
     // MID FREQUENCY LABEL
     midFrequencyLabel.setFont(controlFont);
     midFrequencyLabel.setText("Freq", dontSendNotification);
     midFrequencyLabel.setJustificationType(Justification::centredBottom);
-    midFrequencyLabel.attachToComponent(&midFrequency, false);
+    midFrequencyLabel.attachToComponent(&midFrequencySlider, false);
     addAndMakeVisible(midFrequencyLabel);
 
     // MID BANDWIDTH BUTTONS
@@ -115,16 +121,20 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     GgconvolverAudioProcessorEditor::updateToggleState(0.667f);
     midBw2OctButton.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midBw2OctButton);
+    mBandwidth2Attachement = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.getAPVTS(), "BANDWIDTH2", midBw2OctButton);
 
     midBw1OctButton.setClickingTogglesState(true);
     midBw1OctButton.setRadioGroupId(101);
     midBw1OctButton.onClick = [this] { GgconvolverAudioProcessorEditor::updateToggleState(1.141f); };
+    midBw1OctButton.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midBw1OctButton);
+    mBandwidth1Attachement = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.getAPVTS(), "BANDWIDTH1", midBw1OctButton);
+
+
     midBwLabel.setFont(controlFont);
     midBwLabel.setText("BW", dontSendNotification);
     midBwLabel.setJustificationType(Justification::centredBottom);
     midBwLabel.attachToComponent(&midBw1OctButton, false);
-    midBw1OctButton.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midBwLabel);
 
 
@@ -136,10 +146,12 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     //levelSlider.setSkewFactorFromMidPoint(1.0);
     // Don't show text box with values
     highSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    highSlider.addListener(this);
+    //highSlider.addListener(this);
     //highSlider.setPopupDisplayEnabled(true, false, this);
     highSlider.setLookAndFeel(&lowSliderLookAndFeel);
     addAndMakeVisible(highSlider);
+    mHighAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "HIGH", highSlider);
+
 
     // HIGH SHELF LABEL
     //postLevelLabel.setFont(Font(15.0f, Font::bold));
@@ -155,9 +167,11 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
         irChoice.addItem(BinaryData::namedResourceList[i], i+1);
     }
     
-    irChoice.setSelectedId(1);
-    irChoice.addListener(this);
+    //irChoice.setSelectedId(1);
+    //irChoice.addListener(this);
     addAndMakeVisible(irChoice);   
+    mIrChoiceAttachement = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.getAPVTS(), "IRCHOICE", irChoice);
+
 }
 
 GgconvolverAudioProcessorEditor::~GgconvolverAudioProcessorEditor()
@@ -219,7 +233,7 @@ void GgconvolverAudioProcessorEditor::resized()
     midSlider.setBounds(sliderLeft + 140, sliderRow, w, h);
     highSlider.setBounds(sliderLeft + 220, sliderRow, w, h);
 
-    midFrequency.setBounds(sliderLeft + 117, sliderRow + 60, w, h);
+    midFrequencySlider.setBounds(sliderLeft + 117, sliderRow + 60, w, h);
 
     midBw1OctButton.setBounds(sliderLeft + 165, sliderRow + 60, 40, 18);
     midBw2OctButton.setBounds(sliderLeft + 165, sliderRow + 85, 40, 18);
@@ -228,6 +242,7 @@ void GgconvolverAudioProcessorEditor::resized()
     //irChoice.setBounds(50, 90, 200, 50);
    
 }
+/*
 void GgconvolverAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
     if (&levelSlider == slider) {
@@ -257,6 +272,8 @@ void GgconvolverAudioProcessorEditor::comboBoxChanged(ComboBox* comboBox)
     processor.mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), processor.mIrSize);
 
 }
+
+*/
 void GgconvolverAudioProcessorEditor::updateToggleState(float midPeakQ) {
     processor.mMidPeakQ = midPeakQ;
 }
