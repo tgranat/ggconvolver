@@ -39,7 +39,7 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     //levelSlider.setSkewFactorFromMidPoint(1.0);
     // Don't show text box with values
     levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    levelSlider.setPopupDisplayEnabled(true, false, this);
+    //levelSlider.setPopupDisplayEnabled(true, false, this);
     //levelSlider.addListener(this);
     levelSlider.setLookAndFeel(&basicLookAndFeel);
     addAndMakeVisible(levelSlider);

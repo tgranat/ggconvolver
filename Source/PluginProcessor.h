@@ -16,12 +16,12 @@ namespace Constant {
     // Compensate for lost level in convolver. Seems to lose 50% in convolver.
     // Increase the gain somewhat more so the perceived loudness sounds good (to me)
     const float compensatingOutGain = 1.5;
-
-    const float lowShelfFilterQ = 1.41; // 1 octave = 1.41   2 octave = 0.667
+    // Hardcoded and default values
+    const float lowShelfFilterQ = 1.141f;
     const float lowShelfFrequency = 200.f;
-    const float midPeakFilterQ = 1.41;
-    const float midPeakFrequency = 800.f;
-    const float highShelfFilterQ = 1.41;
+    const float midPeakFilterQ = 1.141f;
+    const float midPeakFrequency = 2100.f;
+    const float highShelfFilterQ = 1.141f;
     const float highShelfFrequency = 4000.f;
     const float oneOctaveQ = 1.141f;
     const float twoOctavesQ = 0.667f;
@@ -112,7 +112,7 @@ private:
     int mCurrentIrLoaded = 1;
     float mCurrentLowShelfGain = 1.f;
     float mCurrentMidPeakGain = 1.f;
-    float mCurrentMidPeakFrequency = 1000.f;
+    float mCurrentMidPeakFrequency = Constant::midPeakFrequency;
     float mCurrentMidPeakQ = Constant::midPeakFilterQ;
     float mCurrentHighShelfGain = 1.f;
 

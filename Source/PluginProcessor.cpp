@@ -234,19 +234,17 @@ AudioProcessorEditor* GgconvolverAudioProcessor::createEditor()
 //==============================================================================
 void GgconvolverAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = getAPVTS().copyState(); 
+    std::unique_ptr<XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void GgconvolverAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-
-    // Note! This method may be called one or several times at startup of a plugin. This means
-    // the stored data will be overwritten with default/start values unless you
-    // have some logic here
+    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName(getAPVTS().state.getType()))
+            getAPVTS().replaceState(ValueTree::fromXml(*xmlState));
 }
 
 //==============================================================================
@@ -279,7 +277,7 @@ AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createP
     for (int i = 0; i < BinaryData::namedResourceListSize; i++) {
         dummyChoices.add("dummy data");
     }
-    parameters.push_back(std::make_unique<AudioParameterChoice>("IRCHOICE", "IR Choice", dummyChoices, 1));
+    parameters.push_back(std::make_unique<AudioParameterChoice>("IRCHOICE", "IR Choice", dummyChoices, 3));
 
     return { parameters.begin(), parameters.end() };
 }
