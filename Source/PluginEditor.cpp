@@ -33,14 +33,8 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     
     // LEVEL SLIDER
     levelSlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    //levelSlider.setRange(0.f, 3.f, 0.01);
-    //levelSlider.setValue(1.0);
-    // Sets mid point to middle of slider even though 1.0 not is in the middle of the range
-    //levelSlider.setSkewFactorFromMidPoint(1.0);
-    // Don't show text box with values
     levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     //levelSlider.setPopupDisplayEnabled(true, false, this);
-    //levelSlider.addListener(this);
     levelSlider.setLookAndFeel(&basicLookAndFeel);
     addAndMakeVisible(levelSlider);
     mLevelAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "LEVEL", levelSlider);
@@ -55,13 +49,9 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
 
     // LOW SHELF SLIDER
     lowSlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    // Filter doesn't like gain = 0.0
-    //lowSlider.setRange(0.05f, 1.95f, 0.01);
-    //lowSlider.setValue(1.f);
     // Don't show text box with values
     lowSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     //lowSlider.setPopupDisplayEnabled(true, false, this);
-    //lowSlider.addListener(this);
     lowSlider.setLookAndFeel(&lowSliderLookAndFeel);
     addAndMakeVisible(lowSlider);
     mLowAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "LOW", lowSlider);
@@ -75,11 +65,8 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
 
     // MID PEAK SLIDER
     midSlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    //midSlider.setRange(0.05f, 1.95f, 0.01);
-   // midSlider.setValue(1.f);
     // Don't show text box with values
     midSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-   // midSlider.addListener(this);
     //midSlider.setPopupDisplayEnabled(true, false, this);
     midSlider.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midSlider);
@@ -94,8 +81,6 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
 
     // MID FREQUENCY SLIDER
     midFrequencySlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    //midFrequencySlider.setRange(200.f, 4000.f, 1.f);
-    //midFrequencySlider.setValue(2100.f);
     // Don't show text box with values
     midFrequencySlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     //midFrequency.addListener(this);
@@ -115,17 +100,12 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     // MID BANDWIDTH BUTTONS
     midBw2OctButton.setClickingTogglesState(true);
     midBw2OctButton.setRadioGroupId(101);
-    midBw2OctButton.onClick = [this] { GgconvolverAudioProcessorEditor::updateToggleState(0.667f); };
-    // Set this button as default on at startup
-    midBw2OctButton.setToggleState(true, false);
-    GgconvolverAudioProcessorEditor::updateToggleState(0.667f);
     midBw2OctButton.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midBw2OctButton);
     mBandwidth2Attachement = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.getAPVTS(), "BANDWIDTH2", midBw2OctButton);
 
     midBw1OctButton.setClickingTogglesState(true);
     midBw1OctButton.setRadioGroupId(101);
-    midBw1OctButton.onClick = [this] { GgconvolverAudioProcessorEditor::updateToggleState(1.141f); };
     midBw1OctButton.setLookAndFeel(&freqSliderLookAndFeel);
     addAndMakeVisible(midBw1OctButton);
     mBandwidth1Attachement = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.getAPVTS(), "BANDWIDTH1", midBw1OctButton);
@@ -142,11 +122,8 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     highSlider.setSliderStyle(Slider::RotaryVerticalDrag);
     highSlider.setRange(0.05f, 1.95f, 0.01);
     highSlider.setValue(1.f);
-    // Sets mid point to middle of slider even though 1.0 not is in the middle of the range
-    //levelSlider.setSkewFactorFromMidPoint(1.0);
     // Don't show text box with values
     highSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    //highSlider.addListener(this);
     //highSlider.setPopupDisplayEnabled(true, false, this);
     highSlider.setLookAndFeel(&lowSliderLookAndFeel);
     addAndMakeVisible(highSlider);
@@ -167,8 +144,6 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
         irChoice.addItem(BinaryData::namedResourceList[i], i+1);
     }
     
-    //irChoice.setSelectedId(1);
-    //irChoice.addListener(this);
     addAndMakeVisible(irChoice);   
     mIrChoiceAttachement = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.getAPVTS(), "IRCHOICE", irChoice);
 
@@ -241,40 +216,5 @@ void GgconvolverAudioProcessorEditor::resized()
     irChoice.setBounds(sliderLeft, sliderRow + 120, getWidth() - sliderLeft - 10, 20);
     //irChoice.setBounds(50, 90, 200, 50);
    
-}
-/*
-void GgconvolverAudioProcessorEditor::sliderValueChanged(Slider* slider)
-{
-    if (&levelSlider == slider) {
-        //processor.mOutLevel = (float)Decibels::decibelsToGain(postLevelSlider.getValue());
-        processor.mOutLevel = levelSlider.getValue();
-    }
-    if (&lowSlider == slider) {
-        processor.mLowShelfGain = lowSlider.getValue();
-    }
-    if (&highSlider == slider) {
-        processor.mHighShelfGain = highSlider.getValue();
-    }
-    if (&midSlider == slider) {
-        processor.mMidPeakGain = midSlider.getValue();
-    }
-    if (&midFrequency == slider) {
-        processor.mMidPeakFrequency = midFrequency.getValue();
-    }
-
-}
-
-void GgconvolverAudioProcessorEditor::comboBoxChanged(ComboBox* comboBox)
-{
-    processor.mIrNumber = comboBox->getSelectedId();
-    int resourceListIndex = comboBox->getSelectedId() - 1;
-    String irName = BinaryData::namedResourceList[resourceListIndex];
-    processor.mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), processor.mIrSize);
-
-}
-
-*/
-void GgconvolverAudioProcessorEditor::updateToggleState(float midPeakQ) {
-    processor.mMidPeakQ = midPeakQ;
 }
 

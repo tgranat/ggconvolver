@@ -109,12 +109,12 @@ private:
     IIRFilter mMidPeakFilters[2];
     IIRFilter mHighShelfFilters[2];
 
-    int mCurrentIrLoaded = 1;
-    float mCurrentLowShelfGain = 1.f;
-    float mCurrentMidPeakGain = 1.f;
-    float mCurrentMidPeakFrequency = Constant::midPeakFrequency;
-    float mCurrentMidPeakQ = Constant::midPeakFilterQ;
-    float mCurrentHighShelfGain = 1.f;
+    int mCurrentIrLoaded;
+    float mCurrentLowShelfGain;
+    float mCurrentMidPeakGain;
+    float mCurrentMidPeakFrequency;
+    float mCurrentMidPeakQ;
+    float mCurrentHighShelfGain;
 
     std::atomic<bool> mParamsHaveBeenUpdated{ false };
  

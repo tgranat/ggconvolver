@@ -270,12 +270,12 @@ AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createP
     parameters.push_back(std::make_unique<AudioParameterBool>("BANDWIDTH1", "BW 1 oct", false));
     parameters.push_back(std::make_unique<AudioParameterBool>("BANDWIDTH2", "BW 2 oct", true));
 
-    // ComboBox is populated in editor.
-    // Workaround: We need to do a "dummy" initiation of choices in the AudioParameterChoice that
-    // corresponds to the number of choices in the ComboBox.
+    // We populate the AudioParameterChoice here BUT we must also populate the ComboBox in the editor.
+    // The nummber of choices must correspond. In the GUI, the strings from the ComboBox are displayed.
+    // If no GUI is used, the strings from the AudioParameterChoice are used.
     StringArray dummyChoices;
     for (int i = 0; i < BinaryData::namedResourceListSize; i++) {
-        dummyChoices.add("dummy data");
+        dummyChoices.add(BinaryData::namedResourceList[i]);
     }
     parameters.push_back(std::make_unique<AudioParameterChoice>("IRCHOICE", "IR Choice", dummyChoices, 3));
 
