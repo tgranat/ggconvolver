@@ -25,24 +25,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
               ), mAPVTS(*this, nullptr, "PARAMETERS", createParameters())
 #endif
 {
-    /*
-     addParameter(mPostLevel = new AudioParameterFloat("postLevel",
-        "Out Level",
-        NormalisableRange<float>(0.1f, 2.f, 0.1f),
-        1.0f,
-        "dB",
-        AudioProcessorParameter::genericParameter,
-        [](float value, int) { return String(20*log10(value), 1); }));
-       // [](float value, int) { return String((float)Decibels::decibelsToGain(value), 2); })); // Didnt work, dont know why
-
-    StringArray irNames = StringArray(&BinaryData::namedResourceList[0], BinaryData::namedResourceListSize);
- 
-    addParameter(mIrChoice = new AudioParameterChoice(
-        "irChoice",
-        "Speaker",
-        irNames,
-        0));
-        */
+    //
 }
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
@@ -116,29 +99,28 @@ void GgconvolverAudioProcessor::changeProgramName (int index, const String& newN
 // Same as VST AudioEffect::setActive(1)
 void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Initiate filters
-    mLowShelfFilters[0].setCoefficients(IIRCoefficients::makeLowShelf(sampleRate, Constant::lowShelfFrequency, Constant::lowShelfFilterQ, 1.0));
-    mLowShelfFilters[1].setCoefficients(IIRCoefficients::makeLowShelf(sampleRate, Constant::lowShelfFrequency, Constant::lowShelfFilterQ, 1.0));
-    mCurrentLowShelfGain = 1.0;
-    mHighShelfFilters[0].setCoefficients(IIRCoefficients::makeHighShelf(sampleRate, Constant::highShelfFrequency, Constant::highShelfFilterQ, 1.0));
-    mHighShelfFilters[1].setCoefficients(IIRCoefficients::makeHighShelf(sampleRate, Constant::highShelfFrequency, Constant::highShelfFilterQ, 1.0));   
-    mCurrentHighShelfGain = 1.0;
-    mMidPeakFilters[0].setCoefficients(IIRCoefficients::makePeakFilter(sampleRate, Constant::midPeakFrequency, Constant::midPeakFilterQ, 1.0));
-    mMidPeakFilters[1].setCoefficients(IIRCoefficients::makePeakFilter(sampleRate, Constant::midPeakFrequency, Constant::midPeakFilterQ, 1.0));
-    mCurrentMidPeakFrequency = Constant::midPeakFrequency;
-    mCurrentMidPeakQ = Constant::midPeakFilterQ;
-    mCurrentMidPeakGain = 1.0f;
+    updateParams();
 
-    // Set IR defaults
-    mIrNumber = 1;
-    String irName = BinaryData::namedResourceList[0];
-    mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), mIrSize);
+    // Initiate filters
+    mLowShelfFilters[0].setCoefficients(IIRCoefficients::makeLowShelf(sampleRate, Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
+    mLowShelfFilters[1].setCoefficients(IIRCoefficients::makeLowShelf(sampleRate, Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
+    mCurrentLowShelfGain = mLowShelfGain;
+    mHighShelfFilters[0].setCoefficients(IIRCoefficients::makeHighShelf(sampleRate, Constant::highShelfFrequency, Constant::highShelfFilterQ, mHighShelfGain));
+    mHighShelfFilters[1].setCoefficients(IIRCoefficients::makeHighShelf(sampleRate, Constant::highShelfFrequency, Constant::highShelfFilterQ, mHighShelfGain));
+    mCurrentHighShelfGain = mHighShelfGain;
+    mMidPeakFilters[0].setCoefficients(IIRCoefficients::makePeakFilter(sampleRate, mMidPeakFrequency, mMidPeakQ, mMidPeakGain));
+    mMidPeakFilters[1].setCoefficients(IIRCoefficients::makePeakFilter(sampleRate, mMidPeakFrequency, mMidPeakQ, mMidPeakGain));
+    mCurrentMidPeakFrequency = mMidPeakFrequency;
+    mCurrentMidPeakQ = mMidPeakQ;
+    mCurrentMidPeakGain = mMidPeakGain;
+
     // Initialize convolution  
     dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getTotalNumInputChannels();
     mConvolution.prepare(spec);
+    // Set first impulse response
     updateConvolution();
     mCurrentIrLoaded = mIrNumber;
  }
@@ -182,19 +164,13 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
     // Improve this later. All params always updated every time now
     updateParams();
 
-    // Check if IR to use has been changed in GUI
+    // Update IR if it has been changed in GUI
     if (mIrNumber != mCurrentIrLoaded) {
         updateConvolution();
         mCurrentIrLoaded = mIrNumber;
@@ -202,16 +178,19 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
 
     //float preRMSLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
 
+    // Process impulse response
     dsp::AudioBlock<float> block(buffer);
     dsp::ProcessContextReplacing<float> context(block);
     mConvolution.process(context);
 
+    // Process filters
     for (int channel = 0; channel < totalNumInputChannels; ++channel) {
         mLowShelfFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
         mMidPeakFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
         mHighShelfFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
     }
 
+    // Update filters that have been updated in gui
      if (mLowShelfGain != mCurrentLowShelfGain) {
         for (int channel = 0; channel < totalNumInputChannels; ++channel) {
             mLowShelfFilters[channel].setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
@@ -234,6 +213,7 @@ void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         mCurrentMidPeakGain = mMidPeakGain;
     }
 
+    // Apply output level + compensating gain to achieve that the perceived loudness sounds good (to me)
     buffer.applyGain(mOutLevel * Constant::compensatingOutGain);
 }
 
@@ -290,18 +270,19 @@ AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createP
     parameters.push_back(std::make_unique<AudioParameterBool>("BANDWIDTH1", "BW 1 oct", false));
     parameters.push_back(std::make_unique<AudioParameterBool>("BANDWIDTH2", "BW 2 oct", true));
 
-    //for (int i = 0; i < BinaryData::namedResourceListSize; i++) {
-    //    irChoices.add(BinaryData::namedResourceList[i]);
-    //}
-    // ComboBox populated in editor.
-    parameters.push_back(std::make_unique<AudioParameterChoice>("IRCHOICE", "IR Choice", StringArray(), 0));
-
-
+    // ComboBox is populated in editor.
+    // Workaround: We need to do a "dummy" initiation of choices in the AudioParameterChoice that
+    // corresponds to the number of choices in the ComboBox.
+    StringArray dummyChoices;
+    for (int i = 0; i < BinaryData::namedResourceListSize; i++) {
+        dummyChoices.add("dummy data");
+    }
+    parameters.push_back(std::make_unique<AudioParameterChoice>("IRCHOICE", "IR Choice", dummyChoices, 1));
 
     return { parameters.begin(), parameters.end() };
 }
 
-// update all paramsfrom gui. Need to change this later. All params including reading the IR data is done every time
+// update params from gui. 
 void GgconvolverAudioProcessor::updateParams() {
     // Level gain
     mOutLevel = mAPVTS.getRawParameterValue("LEVEL")->load();
@@ -312,21 +293,17 @@ void GgconvolverAudioProcessor::updateParams() {
     // Mid peak frequency
     mMidPeakFrequency = mAPVTS.getRawParameterValue("MID FREQ")->load();
     // Mid peak q
-    // May change this
     mBandwidth1 = mAPVTS.getRawParameterValue("BANDWIDTH1")->load();
     mBandwidth2 = mAPVTS.getRawParameterValue("BANDWIDTH2")->load();
-    if (mBandwidth1) mMidPeakQ = 1.141;
-    if (mBandwidth2) mMidPeakQ = 0.667;
+    if (mBandwidth1) mMidPeakQ = Constant::oneOctaveQ;
+    if (mBandwidth2) mMidPeakQ = Constant::twoOctavesQ;
     // High shelving filter gain
     mHighShelfGain = mAPVTS.getRawParameterValue("HIGH")->load();
     // IR data id
     mIrNumber = mAPVTS.getRawParameterValue("IRCHOICE")->load();
     // Size of IR
-    int mIrSize;
     String irName = BinaryData::namedResourceList[mIrNumber];
     mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), mIrSize);
 
 
-    // IR data
-    const char* mIrData;
 }

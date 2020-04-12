@@ -23,6 +23,8 @@ namespace Constant {
     const float midPeakFrequency = 800.f;
     const float highShelfFilterQ = 1.41;
     const float highShelfFrequency = 4000.f;
+    const float oneOctaveQ = 1.141f;
+    const float twoOctavesQ = 0.667f;
 }
 //==============================================================================
 /**
