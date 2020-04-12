@@ -25,7 +25,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
               ), mAPVTS(*this, nullptr, "PARAMETERS", createParameters())
 #endif
 {
-    //
+    mAPVTS.state.addListener(this);
 }
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
@@ -158,17 +158,19 @@ bool GgconvolverAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
-void GgconvolverAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
+void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+        buffer.clear(i, 0, buffer.getNumSamples());
 
-    // Improve this later. All params always updated every time now
-    updateParams();
+    if (mParamsHaveBeenUpdated) {
+       updateParams();
+       mParamsHaveBeenUpdated = false;
+    }
 
     // Update IR if it has been changed in GUI
     if (mIrNumber != mCurrentIrLoaded) {
@@ -282,6 +284,10 @@ AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createP
     return { parameters.begin(), parameters.end() };
 }
 
+void GgconvolverAudioProcessor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) {
+    mParamsHaveBeenUpdated = true;
+}
+
 // update params from gui. 
 void GgconvolverAudioProcessor::updateParams() {
     // Level gain
@@ -304,6 +310,5 @@ void GgconvolverAudioProcessor::updateParams() {
     // Size of IR
     String irName = BinaryData::namedResourceList[mIrNumber];
     mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), mIrSize);
-
 
 }

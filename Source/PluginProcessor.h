@@ -29,7 +29,8 @@ namespace Constant {
 //==============================================================================
 /**
 */
-class GgconvolverAudioProcessor  : public AudioProcessor
+class GgconvolverAudioProcessor  : public AudioProcessor,
+                                   public ValueTree::Listener
 {
 public:
     //==============================================================================
@@ -100,14 +101,13 @@ private:
     
     AudioProcessorValueTreeState mAPVTS;
     AudioProcessorValueTreeState::ParameterLayout createParameters();
+    void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
     void updateParams();
     dsp::Convolution mConvolution;
 
     IIRFilter mLowShelfFilters[2];
     IIRFilter mMidPeakFilters[2];
     IIRFilter mHighShelfFilters[2];
-    //IIRFilter mLowShelfFilter1;
-    //IIRFilter mLowShelfFilter2;
 
     int mCurrentIrLoaded = 1;
     float mCurrentLowShelfGain = 1.f;
@@ -115,6 +115,8 @@ private:
     float mCurrentMidPeakFrequency = 1000.f;
     float mCurrentMidPeakQ = Constant::midPeakFilterQ;
     float mCurrentHighShelfGain = 1.f;
+
+    std::atomic<bool> mParamsHaveBeenUpdated{ false };
  
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GgconvolverAudioProcessor)
