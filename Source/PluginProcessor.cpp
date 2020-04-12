@@ -234,6 +234,8 @@ AudioProcessorEditor* GgconvolverAudioProcessor::createEditor()
 //==============================================================================
 void GgconvolverAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
+    // Run updateParams() to make sure latest GUI params have been fecthed (in case of "Reset to factory")
+    updateParams();
     auto state = getAPVTS().copyState(); 
     std::unique_ptr<XmlElement> xml(state.createXml());
     copyXmlToBinary(*xml, destData);
