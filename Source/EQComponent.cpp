@@ -14,15 +14,31 @@
 //==============================================================================
 EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
     Font controlFont("Ariel", 13.0f, Font::plain);
+
+    basicLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::blue);
+    basicLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
 
     lowSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::yellow);
     lowSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
 
     midLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::green);
     midLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
+
+    // LEVEL SLIDER
+    levelSlider.setSliderStyle(Slider::RotaryVerticalDrag);
+    levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    //levelSlider.setPopupDisplayEnabled(true, false, this);
+    levelSlider.setLookAndFeel(&basicLookAndFeel);
+    addAndMakeVisible(levelSlider);
+    mLevelAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "LEVEL", levelSlider);
+
+    // LEVEL LABEL
+    levelLabel.setFont(controlFont);
+    levelLabel.setText("Level", dontSendNotification);
+    levelLabel.setJustificationType(Justification::centredBottom);
+    levelLabel.attachToComponent(&levelSlider, false);
+    addAndMakeVisible(levelLabel);
 
     // LOW SHELF SLIDER
     lowSlider.setSliderStyle(Slider::RotaryVerticalDrag);
@@ -106,7 +122,6 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
     addAndMakeVisible(highSlider);
     mHighAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "HIGH", highSlider);
 
-
     // HIGH SHELF LABEL
     //postLevelLabel.setFont(Font(15.0f, Font::bold));
     highLabel.setFont(controlFont);
@@ -122,7 +137,34 @@ EQComponent::~EQComponent()
 
 void EQComponent::paint (Graphics& g)
 {
-    //g.setColour(Colours::white);
+    g.setColour(Colours::white);
+    // Paint frames for the level and eq controls
+    paintFrame(10, 50, g);
+    paintFrame(10 + 60, 50, g);
+    paintFrame(10 + 220, 50, g);
+    paintFrameWide(10 + 140, 50, g);
+}
+
+void EQComponent::paintFrame(float sx, float sy, Graphics& g) {
+    Path path;
+    path.startNewSubPath(sx + 5, sy - 10);
+    path.lineTo(sx, sy - 10);
+    path.lineTo(sx, sy + 55);
+    path.startNewSubPath(sx + 50, sy + 55);
+    path.lineTo(sx + 50, sy - 10);
+    path.lineTo(sx + 45, sy - 10);
+    g.strokePath(path, PathStrokeType(2.0f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::square));
+}
+
+void EQComponent::paintFrameWide(float sx, float sy, Graphics& g) {
+    Path path;
+    path.startNewSubPath(sx + 5, sy - 10);
+    path.lineTo(sx - 20, sy - 10);
+    path.lineTo(sx - 20, sy + 55);
+    path.startNewSubPath(sx + 45, sy - 10);
+    path.lineTo(sx + 70, sy - 10);
+    path.lineTo(sx + 70, sy + 55);
+    g.strokePath(path, PathStrokeType(2.0f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::square));
 }
 
 void EQComponent::resized()
@@ -131,12 +173,12 @@ void EQComponent::resized()
     int sliderRow = 50;
     int w = 50;
     int h = 50;
+
+    levelSlider.setBounds(sliderLeft, sliderRow, w, h);
     lowSlider.setBounds(sliderLeft + 60, sliderRow, w, h);
     midSlider.setBounds(sliderLeft + 140, sliderRow, w, h);
     highSlider.setBounds(sliderLeft + 220, sliderRow, w, h);
-
     midFrequencySlider.setBounds(sliderLeft + 117, sliderRow + 60, w, h);
-
     midBw1OctButton.setBounds(sliderLeft + 165, sliderRow + 60, 40, 18);
     midBw2OctButton.setBounds(sliderLeft + 165, sliderRow + 85, 40, 18);
 

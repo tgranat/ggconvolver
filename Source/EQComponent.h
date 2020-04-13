@@ -27,9 +27,15 @@ public:
     void resized() override;
 
 private:
+    void paintFrame(float x, float y, Graphics& g);
+    void paintFrameWide(float x, float y, Graphics& g);
+
+    LookAndFeelHelp basicLookAndFeel;
     LookAndFeelHelp lowSliderLookAndFeel;
     LookAndFeelHelp midLookAndFeel;
 
+    Label levelLabel;
+    Slider levelSlider;
     Slider lowSlider;
     Slider highSlider;
     Slider midSlider;
@@ -44,7 +50,7 @@ private:
     TextButton midBw2OctButton{ "2 oct." };
     TextButton midBw1OctButton{ "1 oct." };
 
-
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mLevelAttachement;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mLowAttachement;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mMidAttachement;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mHighAttachement;
