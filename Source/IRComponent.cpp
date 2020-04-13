@@ -37,8 +37,5 @@ void IRComponent::paint (Graphics& g)
 
 void IRComponent::resized()
 {
-    int sliderLeft = 10;
-    int sliderRow = 50;
-
-    irChoice.setBounds(sliderLeft, sliderRow + 120, getWidth() - sliderLeft - 10, 20);
+    irChoice.setBounds(0, 0, 280, 20);
 }

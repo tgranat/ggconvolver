@@ -35,7 +35,7 @@ void GgconvolverAudioProcessorEditor::paint (Graphics& g)
 
 void GgconvolverAudioProcessorEditor::resized()
 {
-    mLevelAndEQ.setBounds(0, 0, 300, 200);
-    mIrChoiceDropdown.setBounds(0, 0, 300, 200);
+    mLevelAndEQ.setBounds(0, 0, 300, 170);
+    mIrChoiceDropdown.setBounds(10, 170, 300, 30);
 }
 
