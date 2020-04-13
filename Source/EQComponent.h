@@ -11,6 +11,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "PluginProcessor.h"
+#include "LookAndFeelHelp.h"
 
 //==============================================================================
 /*
@@ -18,12 +20,39 @@
 class EQComponent    : public Component
 {
 public:
-    EQComponent();
+    EQComponent(GgconvolverAudioProcessor& p);
     ~EQComponent();
 
     void paint (Graphics&) override;
     void resized() override;
 
 private:
+    LookAndFeelHelp lowSliderLookAndFeel;
+    LookAndFeelHelp midLookAndFeel;
+
+    Slider lowSlider;
+    Slider highSlider;
+    Slider midSlider;
+    Slider midFrequencySlider;
+
+    Label lowLabel;
+    Label highLabel;
+    Label midLabel;
+    Label midFrequencyLabel;
+    Label midBwLabel;
+
+    TextButton midBw2OctButton{ "2 oct." };
+    TextButton midBw1OctButton{ "1 oct." };
+
+
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mLowAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mMidAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mHighAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mMidFreqencyAttachement;
+    std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth1Attachement;
+    std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth2Attachement;
+
+    GgconvolverAudioProcessor& processor;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQComponent)
 };
