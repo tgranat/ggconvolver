@@ -27,8 +27,8 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     lowSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::yellow);
     lowSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
 
-    freqSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::green);
-    freqSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
+    midLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::green);
+    midLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
 
     
     // LEVEL SLIDER
@@ -68,7 +68,7 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     // Don't show text box with values
     midSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     //midSlider.setPopupDisplayEnabled(true, false, this);
-    midSlider.setLookAndFeel(&freqSliderLookAndFeel);
+    midSlider.setLookAndFeel(&midLookAndFeel);
     addAndMakeVisible(midSlider);
     mMidAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "MID", midSlider);
 
@@ -86,7 +86,7 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     //midFrequency.addListener(this);
     midFrequencySlider.setPopupDisplayEnabled(true, false, this);
     midFrequencySlider.setTextValueSuffix(" Hz");
-    midFrequencySlider.setLookAndFeel(&freqSliderLookAndFeel);
+    midFrequencySlider.setLookAndFeel(&midLookAndFeel);
     addAndMakeVisible(midFrequencySlider);
     mMidFreqencyAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "MID FREQ", midFrequencySlider);
 
@@ -100,13 +100,13 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     // MID BANDWIDTH BUTTONS
     midBw2OctButton.setClickingTogglesState(true);
     midBw2OctButton.setRadioGroupId(101);
-    midBw2OctButton.setLookAndFeel(&freqSliderLookAndFeel);
+    midBw2OctButton.setLookAndFeel(&midLookAndFeel);
     addAndMakeVisible(midBw2OctButton);
     mBandwidth2Attachement = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.getAPVTS(), "BANDWIDTH2", midBw2OctButton);
 
     midBw1OctButton.setClickingTogglesState(true);
     midBw1OctButton.setRadioGroupId(101);
-    midBw1OctButton.setLookAndFeel(&freqSliderLookAndFeel);
+    midBw1OctButton.setLookAndFeel(&midLookAndFeel);
     addAndMakeVisible(midBw1OctButton);
     mBandwidth1Attachement = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.getAPVTS(), "BANDWIDTH1", midBw1OctButton);
 

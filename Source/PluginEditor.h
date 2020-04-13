@@ -29,20 +29,22 @@ private:
 
     LookAndFeelHelp basicLookAndFeel;
     LookAndFeelHelp lowSliderLookAndFeel;
-    LookAndFeelHelp freqSliderLookAndFeel;
+    LookAndFeelHelp midLookAndFeel;
 
     ComboBox irChoice;
+    Label levelLabel;
     Slider levelSlider;
     Slider lowSlider;
     Slider highSlider;
     Slider midSlider;
     Slider midFrequencySlider;
-    Label levelLabel;
+
     Label lowLabel;
     Label highLabel;
     Label midLabel;
     Label midFrequencyLabel;
     Label midBwLabel;
+
     TextButton midBw2OctButton { "2 oct." };
     TextButton midBw1OctButton{ "1 oct." };
 
