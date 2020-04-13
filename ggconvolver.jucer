@@ -14,16 +14,19 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="rhiLQv" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
-    <FILE id="TVi9N5" name="Celestion_V30_44100Hz_200ms.wav" compile="0"
-          resource="1" file="Resources/Celestion_V30_44100Hz_200ms.wav"/>
-    <FILE id="rgsbyO" name="MusicMan_210_back_44100Hz_200ms.wav" compile="0"
-          resource="1" file="Resources/MusicMan_210_back_44100Hz_200ms.wav"/>
-    <FILE id="jeFQyn" name="MusicMan_210_offaxis_44100Hz_200ms.wav" compile="0"
-          resource="1" file="Resources/MusicMan_210_offaxis_44100Hz_200ms.wav"/>
-    <FILE id="AWnnFL" name="MusicMan_210_onaxis_44100Hz_200ms.wav" compile="0"
-          resource="1" file="Resources/MusicMan_210_onaxis_44100Hz_200ms.wav"/>
-    <FILE id="bobsY7" name="Ampeg V4-B_44100Hz.wav" compile="0" resource="1"
-          file="Resources/Ampeg V4-B_44100Hz.wav"/>
+    <FILE id="AWnnFL" name="MusicMan_2x10_onaxis" compile="0" resource="1"
+          file="Resources/MusicMan_2x10_onaxis"/>
+    <FILE id="jeFQyn" name="MusicMan_2x10_offaxis" compile="0" resource="1"
+          file="Resources/MusicMan_2x10_offaxis"/>
+    <FILE id="rgsbyO" name="MusicMan_2x10_back" compile="0" resource="1"
+          file="Resources/MusicMan_2x10_back"/>
+    <FILE id="TVi9N5" name="Celestion_V30_1x12" compile="0" resource="1"
+          file="Resources/Celestion_V30_1x12"/>
+    <FILE id="bobsY7" name="Ampeg_V4B_4x12" compile="0" resource="1" file="Resources/Ampeg_V4B_4x12"/>
+    <FILE id="zKXzEU" name="Orange_Matamp_4x12" compile="0" resource="1"
+          file="Resources/Orange_Matamp_4x12"/>
+    <FILE id="QSHhI7" name="Musicman_Hardtke" compile="0" resource="1"
+          file="Resources/Musicman_Hardtke"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019">
