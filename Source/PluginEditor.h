@@ -14,25 +14,9 @@
 #include "PluginProcessor.h"
 
 // From LookAndFeel_V2
-namespace LookAndFeelHelpers
-{
-    static Colour createBaseColour(Colour buttonColour,
-        bool hasKeyboardFocus,
-        bool shouldDrawButtonAsHighlighted,
-        bool shouldDrawButtonAsDown) noexcept
-    {
-        const float sat = hasKeyboardFocus ? 1.3f : 0.9f;
-        const Colour baseColour(buttonColour.withMultipliedSaturation(sat));
 
-        if (shouldDrawButtonAsDown)        return baseColour.contrasting(0.2f);
- //       if (shouldDrawButtonAsDown)        return Colours::green;
-        if (shouldDrawButtonAsHighlighted) return baseColour.contrasting(0.1f);
-
-        return baseColour;
-    }
-}
 // Customize gui look and feel
-class MyLookAndFeel : public LookAndFeel_V4 {
+class LookAndFeelHelp : public LookAndFeel_V4 {
 public:
     void drawRotarySlider(Graphics& g, int x, int y, int width, int height, float sliderPos,
         const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider) override
@@ -105,7 +89,7 @@ public:
         const float indentB = button.isConnectedOnBottom() ? 0.1f : halfThickness;
 
         
-        const Colour baseColour(LookAndFeelHelpers::createBaseColour(button.getToggleState() ? findColour(ColourTarget::tip) : backgroundColour,
+        const Colour baseColour(createBaseColour(button.getToggleState() ? findColour(ColourTarget::tip) : backgroundColour,
             button.hasKeyboardFocus(true),
             isMouseOverButton,
             isButtonDown)
@@ -124,10 +108,23 @@ public:
             button.isConnectedOnTop(),
             button.isConnectedOnBottom());
     }
+    enum ColourTarget { tip, top };
 
+private:
+    static Colour createBaseColour(Colour buttonColour,
+        bool hasKeyboardFocus,
+        bool shouldDrawButtonAsHighlighted,
+        bool shouldDrawButtonAsDown) noexcept
+    {
+        const float sat = hasKeyboardFocus ? 1.3f : 0.9f;
+        const Colour baseColour(buttonColour.withMultipliedSaturation(sat));
 
+        if (shouldDrawButtonAsDown)        return baseColour.contrasting(0.2f);
+        //       if (shouldDrawButtonAsDown)        return Colours::green;
+        if (shouldDrawButtonAsHighlighted) return baseColour.contrasting(0.1f);
 
-    enum ColourTarget {tip, top};
+        return baseColour;
+    }
  };
 
 
@@ -144,9 +141,9 @@ private:
     void paintFrame(float x, float y, Graphics& g);
     void paintFrameHalf(float x, float y, Graphics& g);
 
-    MyLookAndFeel basicLookAndFeel;
-    MyLookAndFeel lowSliderLookAndFeel;
-    MyLookAndFeel freqSliderLookAndFeel;
+    LookAndFeelHelp basicLookAndFeel;
+    LookAndFeelHelp lowSliderLookAndFeel;
+    LookAndFeelHelp freqSliderLookAndFeel;
 
     ComboBox irChoice;
     Slider levelSlider;

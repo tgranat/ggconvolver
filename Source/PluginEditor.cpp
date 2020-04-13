@@ -21,14 +21,14 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
     Font controlFont("Ariel", 13.0f, Font::plain);
 
     // Init look and feel
-    basicLookAndFeel.setColour(MyLookAndFeel::ColourTarget::tip, Colours::blue);
-    basicLookAndFeel.setColour(MyLookAndFeel::ColourTarget::top, Colours::grey);
+    basicLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::blue);
+    basicLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
 
-    lowSliderLookAndFeel.setColour(MyLookAndFeel::ColourTarget::tip, Colours::yellow);
-    lowSliderLookAndFeel.setColour(MyLookAndFeel::ColourTarget::top, Colours::grey);
+    lowSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::yellow);
+    lowSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
 
-    freqSliderLookAndFeel.setColour(MyLookAndFeel::ColourTarget::tip, Colours::green);
-    freqSliderLookAndFeel.setColour(MyLookAndFeel::ColourTarget::top, Colours::grey);
+    freqSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::green);
+    freqSliderLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::top, Colours::grey);
 
     
     // LEVEL SLIDER

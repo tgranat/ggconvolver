@@ -13,6 +13,8 @@
       <FILE id="wDag7r" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="rhiLQv" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="iY1EpA" name="EQComponent.cpp" compile="1" resource="0" file="Source/EQComponent.cpp"/>
+      <FILE id="f07Hme" name="EQComponent.h" compile="0" resource="0" file="Source/EQComponent.h"/>
     </GROUP>
     <FILE id="AWnnFL" name="MusicMan_2x10_onaxis" compile="0" resource="1"
           file="Resources/MusicMan_2x10_onaxis"/>
