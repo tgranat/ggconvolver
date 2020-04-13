@@ -7,8 +7,10 @@ The impulse responses are either recorded by me or found on the internet and giv
 
 I have now added some EQ.
 
+Parameter settings are also stored so they are saved when the DAW project is saved.
+
 Todo/Work in progress:
 
-Store/fetch parameters settings.
-
 Would like some VU meters (like I have in the https://github.com/tgranat/vstplugin_dev/tree/master/ggconvolver that I made using the VST SDK)
+
+Do some refactoring.
