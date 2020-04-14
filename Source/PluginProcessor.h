@@ -116,7 +116,7 @@ private:
     float mCurrentMidPeakQ;
     float mCurrentHighShelfGain;
 
-    std::atomic<bool> mParamsHaveBeenUpdated{ false };
+    std::atomic<bool> mParamsHaveBeenUpdatedInGUI{ false };
  
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GgconvolverAudioProcessor)

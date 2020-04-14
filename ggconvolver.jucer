@@ -29,8 +29,6 @@
     <FILE id="TVi9N5" name="Celestion_V30_1x12" compile="0" resource="1"
           file="Resources/Celestion_V30_1x12"/>
     <FILE id="bobsY7" name="Ampeg_V4B_4x12" compile="0" resource="1" file="Resources/Ampeg_V4B_4x12"/>
-    <FILE id="zKXzEU" name="Orange_Matamp_4x12" compile="0" resource="1"
-          file="Resources/Orange_Matamp_4x12"/>
     <FILE id="QSHhI7" name="Musicman_Hardtke" compile="0" resource="1"
           file="Resources/Musicman_Hardtke"/>
   </MAINGROUP>

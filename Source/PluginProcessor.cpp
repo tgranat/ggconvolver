@@ -167,9 +167,9 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    if (mParamsHaveBeenUpdated) {
+    if (mParamsHaveBeenUpdatedInGUI) {
        updateParams();
-       mParamsHaveBeenUpdated = false;
+       mParamsHaveBeenUpdatedInGUI = false;
     }
 
     // Update IR if it has been changed in GUI
@@ -285,7 +285,7 @@ AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createP
 }
 
 void GgconvolverAudioProcessor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) {
-    mParamsHaveBeenUpdated = true;
+    mParamsHaveBeenUpdatedInGUI = true;
 }
 
 // update params from gui. 
