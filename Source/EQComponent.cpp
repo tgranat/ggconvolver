@@ -144,8 +144,40 @@ void EQComponent::paint (Graphics& g)
     paintFrame(10 + 220, 50, g);
     paintFrameWide(10 + 140, 50, g);
     mIrFrame = getLocalBounds().reduced(3, 3);
+    mPlotFrame = mIrFrame.withTrimmedTop(140);
     g.drawRect(mIrFrame);
+    g.drawRect(mPlotFrame);
+
+    // Paint frequency and dB grid
+    g.setFont(Font("Ariel", 9.0f, Font::plain));
+    for (int i = 0; i < 10; ++i) {
+        g.setColour(Colours::silver.withAlpha(0.3f));
+        auto x = mPlotFrame.getX() + mPlotFrame.getWidth() * i * 0.1f;
+        if (i > 0) g.drawVerticalLine(roundToInt(x), mPlotFrame.getY(), mPlotFrame.getBottom());
+
+        g.setColour(Colours::silver);
+        auto freq = getFrequencyForPosition(i * 0.1f);
+        g.drawFittedText((freq < 1000) ? String(freq) + " Hz" : String(freq / 1000, 1) + " kHz",
+            roundToInt(x + 3), mPlotFrame.getBottom() - 18, 50, 15, Justification::left, 1);
+    }
+    g.setColour(Colours::silver.withAlpha(0.3f));
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.25 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.5 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.75 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
+
+    g.setColour(Colours::silver);
+    g.drawFittedText( "12 dB", mPlotFrame.getX() + 3, mPlotFrame.getY() + 2, 50, 14, Justification::left, 1);
+    g.drawFittedText("6 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.25 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+    g.drawFittedText(" 0 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.5 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+    g.drawFittedText("6 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.75 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+
 }
+
+float EQComponent::getFrequencyForPosition(float pos)
+{
+    return 20.0f * std::pow(2.0f, pos * 10.0f);
+}
+
 
 void EQComponent::paintFrame(float sx, float sy, Graphics& g) {
     Path path;
@@ -184,4 +216,10 @@ void EQComponent::resized()
     midBw1OctButton.setBounds(sliderLeft + 165, sliderRow + 60, 40, 18);
     midBw2OctButton.setBounds(sliderLeft + 165, sliderRow + 85, 40, 18);
 
+    updateFrequencyResponses();
 }
+
+void EQComponent::updateFrequencyResponses() {
+
+}
+

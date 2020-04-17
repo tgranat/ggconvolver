@@ -24,11 +24,16 @@ public:
     ~EQComponent();
 
     void paint (Graphics&) override;
+ 
     void resized() override;
+
+    Path frequencyResponse;
 
 private:
     void paintFrame(float x, float y, Graphics& g);
     void paintFrameWide(float x, float y, Graphics& g);
+    float getFrequencyForPosition(float pos);
+    void updateFrequencyResponses();
 
     LookAndFeelHelp basicLookAndFeel;
     LookAndFeelHelp lowSliderLookAndFeel;
@@ -59,6 +64,7 @@ private:
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth2Attachement;
 
     Rectangle<int> mIrFrame;
+    Rectangle<int> mPlotFrame;
 
     GgconvolverAudioProcessor& processor;
 
