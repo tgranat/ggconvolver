@@ -143,6 +143,8 @@ void EQComponent::paint (Graphics& g)
     paintFrame(10 + 60, 50, g);
     paintFrame(10 + 220, 50, g);
     paintFrameWide(10 + 140, 50, g);
+    mIrFrame = getLocalBounds().reduced(3, 3);
+    g.drawRect(mIrFrame);
 }
 
 void EQComponent::paintFrame(float sx, float sy, Graphics& g) {
@@ -170,7 +172,7 @@ void EQComponent::paintFrameWide(float sx, float sy, Graphics& g) {
 void EQComponent::resized()
 {
     int sliderLeft = 10;
-    int sliderRow = 50;
+    int sliderRow = 25;
     int w = 50;
     int h = 50;
 

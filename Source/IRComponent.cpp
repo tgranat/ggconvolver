@@ -33,9 +33,12 @@ IRComponent::~IRComponent()
 
 void IRComponent::paint (Graphics& g)
 {
+    g.setColour(Colours::white);
+    mIrFrame = getLocalBounds().reduced(3, 3);
+    g.drawRect(mIrFrame);
 }
 
 void IRComponent::resized()
 {
-    irChoice.setBounds(0, 0, 280, 20);
+    irChoice.setBounds(5, 5, 290, 20);
 }

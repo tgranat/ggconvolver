@@ -58,6 +58,8 @@ private:
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth1Attachement;
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth2Attachement;
 
+    Rectangle<int> mIrFrame;
+
     GgconvolverAudioProcessor& processor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQComponent)

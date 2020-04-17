@@ -103,11 +103,17 @@ private:
     AudioProcessorValueTreeState::ParameterLayout createParameters();
     void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
     void updateParams();
+
     dsp::Convolution mConvolution;
 
     IIRFilter mLowShelfFilters[2];
     IIRFilter mMidPeakFilters[2];
     IIRFilter mHighShelfFilters[2];
+
+    
+
+    std::vector<double> mFrequencies;
+    std::vector<double> mMagnitudes;
 
     int mCurrentIrLoaded;
     float mCurrentLowShelfGain;

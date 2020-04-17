@@ -28,6 +28,8 @@ public:
 private:
     ComboBox irChoice;
 
+    Rectangle<int> mIrFrame;
+
     std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> mIrChoiceAttachement;
 
     GgconvolverAudioProcessor& processor;

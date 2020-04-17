@@ -17,7 +17,7 @@ GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAud
 {
     addAndMakeVisible(mLevelAndEQ);
     addAndMakeVisible(mIrChoiceDropdown);
-    setSize (300, 200);
+    setSize (300, 300);
 }
 
 GgconvolverAudioProcessorEditor::~GgconvolverAudioProcessorEditor()
@@ -35,7 +35,7 @@ void GgconvolverAudioProcessorEditor::paint (Graphics& g)
 
 void GgconvolverAudioProcessorEditor::resized()
 {
-    mLevelAndEQ.setBounds(0, 0, 300, 170);
-    mIrChoiceDropdown.setBounds(10, 170, 300, 30);
+    mLevelAndEQ.setBounds(0, 25, 300, 249);
+    mIrChoiceDropdown.setBounds(0, 270, 300, 30);
 }
 

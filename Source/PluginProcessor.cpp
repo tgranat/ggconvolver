@@ -26,6 +26,14 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
 #endif
 {
     mAPVTS.state.addListener(this);
+
+    //
+    mFrequencies.resize(300);
+    for (size_t i = 0; i < mFrequencies.size(); ++i) {
+        mFrequencies[i] = 20.0 * std::pow(2.0, i / 30.0);
+    }
+    mMagnitudes.resize(mFrequencies.size());
+
 }
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
@@ -209,6 +217,7 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     if (mMidPeakFrequency != mCurrentMidPeakFrequency || mMidPeakQ != mCurrentMidPeakQ || mMidPeakGain != mCurrentMidPeakGain) {
         for (int channel = 0; channel < totalNumInputChannels; ++channel) {
             mMidPeakFilters[channel].setCoefficients(IIRCoefficients::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain));
+
         }
         mCurrentMidPeakFrequency = mMidPeakFrequency;
         mCurrentMidPeakQ = mMidPeakQ;
@@ -311,4 +320,17 @@ void GgconvolverAudioProcessor::updateParams() {
     String irName = BinaryData::namedResourceList[mIrNumber];
     mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), mIrSize);
 
+
+    // Test inherit ChangeBroadcaster and send sendChangeMessage();
+    // In editor: inherit ChangeListener and implement changeListenerCallback() which calls processor.createFrequencyPlot() which 
+    // returns a Path& 
+
+    //Testing
+    // Update mMagnitudes
+    //dsp::IIR::Coefficients<float>::Ptr newCoefficients;
+    //newCoefficients = dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain);
+    //newCoefficients->getMagnitudeForFrequencyArray(mFrequencies.data(),
+    //    mMagnitudes.data(),
+    //    mFrequencies.size(), getSampleRate());
+ 
 }
