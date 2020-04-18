@@ -15,22 +15,26 @@
 namespace Constant {
     // Compensate for lost level in convolver. Seems to lose 50% in convolver.
     // Increase the gain somewhat more so the perceived loudness sounds good (to me)
-    const float compensatingOutGain = 1.5;
+    const float compensatingOutGain = 2.f;
     // Hardcoded and default values
-    const float lowShelfFilterQ = 1.141f;
-    const float lowShelfFrequency = 200.f;
+    const float lowShelfFilterQ = 0.667f;
+    const float lowShelfFrequency = 100.f;
     const float midPeakFilterQ = 1.141f;
-    const float midPeakFrequency = 2100.f;
-    const float highShelfFilterQ = 1.141f;
-    const float highShelfFrequency = 4000.f;
+    const float midPeakFrequencyLow = 200.f;
+    const float midPeakFrequencyHigh = 4000.f;
+    const float midPeakFrequency = 1000.f;
+    const float highShelfFilterQ = 0.667f;
+    const float highShelfFrequency = 6000.f;
     const float oneOctaveQ = 1.141f;
     const float twoOctavesQ = 0.667f;
+    const float maxDb = 12.f;
 }
 //==============================================================================
 /**
 */
 class GgconvolverAudioProcessor  : public AudioProcessor,
-                                   public ValueTree::Listener
+                                   public ValueTree::Listener,
+                                   public ChangeBroadcaster
 {
 public:
     //==============================================================================
@@ -69,6 +73,12 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+
+    const std::vector<double>& getMagnitudes();
+    
+    void createFrequencyPlot(Path& p, const std::vector<double>& mags, const Rectangle<int> bounds, float pixelsPerDouble);
+
+    float getMaxDb() { return Constant::maxDb; }
 
     // UI parameters
  
@@ -110,10 +120,15 @@ private:
     IIRFilter mMidPeakFilters[2];
     IIRFilter mHighShelfFilters[2];
 
-    
+    dsp::IIR::Coefficients<float>::Ptr mLowCoefficients;
+    dsp::IIR::Coefficients<float>::Ptr mMidCoefficients;
+    dsp::IIR::Coefficients<float>::Ptr mHighCoefficients;
 
     std::vector<double> mFrequencies;
     std::vector<double> mMagnitudes;
+    std::vector<double> mMidMagnitudes;
+    std::vector<double> mLowMagnitudes;
+    std::vector<double> mHighMagnitudes;
 
     int mCurrentIrLoaded;
     float mCurrentLowShelfGain;

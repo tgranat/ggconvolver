@@ -33,7 +33,9 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
         mFrequencies[i] = 20.0 * std::pow(2.0, i / 30.0);
     }
     mMagnitudes.resize(mFrequencies.size());
-
+    mMidMagnitudes.resize(mFrequencies.size());
+    mLowMagnitudes.resize(mFrequencies.size());
+    mHighMagnitudes.resize(mFrequencies.size());
 }
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
@@ -108,7 +110,6 @@ void GgconvolverAudioProcessor::changeProgramName (int index, const String& newN
 void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     updateParams();
-
     // Initiate filters
     mLowShelfFilters[0].setCoefficients(IIRCoefficients::makeLowShelf(sampleRate, Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
     mLowShelfFilters[1].setCoefficients(IIRCoefficients::makeLowShelf(sampleRate, Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
@@ -131,7 +132,8 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // Set first impulse response
     updateConvolution();
     mCurrentIrLoaded = mIrNumber;
- }
+
+}
 
 // Called when plugin removed (not when only disabled)
 // Also called during startup of plugin (at least on Reaper: first activate, then deactivate, then activate again) 
@@ -237,7 +239,6 @@ bool GgconvolverAudioProcessor::hasEditor() const
 AudioProcessorEditor* GgconvolverAudioProcessor::createEditor()
 {
     return new GgconvolverAudioProcessorEditor (*this);
-    //return new GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -273,11 +274,58 @@ void GgconvolverAudioProcessor::updateConvolution() {
 
 AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createParameters() {
     std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
-    parameters.push_back(std::make_unique<AudioParameterFloat>("LEVEL", "Level", 0.0, 3.0, 1.5));
-    parameters.push_back(std::make_unique<AudioParameterFloat>("LOW", "Low", 0.05f, 1.95f, 1.0f));
-    parameters.push_back(std::make_unique<AudioParameterFloat>("MID", "Mid", 0.05f, 1.95f, 1.0f));
-    parameters.push_back(std::make_unique<AudioParameterFloat>("HIGH", "High", 0.05f, 1.95f, 1.0f));
-    parameters.push_back(std::make_unique<AudioParameterFloat>("MID FREQ", "Mid Freq", 200.f, 4000.f, 2100.f));
+
+    // How to get gain parameters handle dB nicely is inspired by https://github.com/ffAudio/Frequalizer
+
+    const float maxGain = Decibels::decibelsToGain(Constant::maxDb);
+    parameters.push_back(std::make_unique<AudioParameterFloat>("LEVEL", "Level",
+        NormalisableRange<float> {1.0f / maxGain, maxGain, 0.001f,
+        std::log(0.5f) / std::log((1.0f - (1.0f / maxGain)) / (maxGain - (1.0f / maxGain)))},
+        1.f,
+        String(),
+        AudioProcessorParameter::genericParameter,
+        [](float value, int) {return String(Decibels::gainToDecibels(value), 1) + " dB"; },
+        [](String text) {return Decibels::decibelsToGain(text.dropLastCharacters(3).getFloatValue()); }));
+
+    parameters.push_back(std::make_unique<AudioParameterFloat>("LOW", "Low",
+        NormalisableRange<float> {1.0f / maxGain, maxGain, 0.001f,
+        std::log(0.5f) / std::log((1.0f - (1.0f / maxGain)) / (maxGain - (1.0f / maxGain)))},
+        1.f,
+        String(),
+        AudioProcessorParameter::genericParameter,
+        [](float value, int) {return String(Decibels::gainToDecibels(value), 1) + " dB"; },
+        [](String text) {return Decibels::decibelsToGain(text.dropLastCharacters(3).getFloatValue()); }));
+
+    parameters.push_back(std::make_unique<AudioParameterFloat>("MID", "Mid",
+        NormalisableRange<float> {1.0f / maxGain, maxGain, 0.001f,
+        std::log(0.5f) / std::log((1.0f - (1.0f / maxGain)) / (maxGain - (1.0f / maxGain)))},
+        1.f,
+        String(),
+        AudioProcessorParameter::genericParameter,
+        [](float value, int) {return String(Decibels::gainToDecibels(value), 1) + " dB"; },
+        [](String text) {return Decibels::decibelsToGain(text.dropLastCharacters(3).getFloatValue()); }));
+
+    parameters.push_back(std::make_unique<AudioParameterFloat>("HIGH", "High",
+        NormalisableRange<float> {1.0f / maxGain, maxGain, 0.001f,
+        std::log(0.5f) / std::log((1.0f - (1.0f / maxGain)) / (maxGain - (1.0f / maxGain)))},
+        1.f,
+        String(),
+        AudioProcessorParameter::genericParameter,
+        [](float value, int) {return String(Decibels::gainToDecibels(value), 1) + " dB"; },
+        [](String text) {return Decibels::decibelsToGain(text.dropLastCharacters(3).getFloatValue()); }));
+
+    parameters.push_back(std::make_unique<AudioParameterFloat>("MID FREQ", "Mid Freq",
+        NormalisableRange<float> {Constant::midPeakFrequencyLow, 
+                                  Constant::midPeakFrequencyHigh,
+                                  1.0f, std::log(0.5f) / std::log((Constant::midPeakFrequency-Constant::midPeakFrequencyLow) / (Constant::midPeakFrequencyHigh- Constant::midPeakFrequencyLow))},
+        Constant::midPeakFrequency,
+        String(),
+        AudioProcessorParameter::genericParameter,
+        [](float value, int) { return (value < 1000) ? String(value, 0) + " Hz" : String(value / 1000.0, 2) + " kHz"; },
+        [](String text) { return text.endsWith(" kHz") ? text.dropLastCharacters(4).getFloatValue() * 1000.0 : text.dropLastCharacters(3).getFloatValue(); }));
+
+    // TODO: Make this an AudioParameterChoice instead
+
     parameters.push_back(std::make_unique<AudioParameterBool>("BANDWIDTH1", "BW 1 oct", false));
     parameters.push_back(std::make_unique<AudioParameterBool>("BANDWIDTH2", "BW 2 oct", true));
 
@@ -310,8 +358,13 @@ void GgconvolverAudioProcessor::updateParams() {
     // Mid peak q
     mBandwidth1 = mAPVTS.getRawParameterValue("BANDWIDTH1")->load();
     mBandwidth2 = mAPVTS.getRawParameterValue("BANDWIDTH2")->load();
-    if (mBandwidth1) mMidPeakQ = Constant::oneOctaveQ;
-    if (mBandwidth2) mMidPeakQ = Constant::twoOctavesQ;
+    
+    if (mBandwidth1) {
+        mMidPeakQ = Constant::oneOctaveQ;
+    }
+    if (mBandwidth2) {
+        mMidPeakQ = Constant::twoOctavesQ;
+    }
     // High shelving filter gain
     mHighShelfGain = mAPVTS.getRawParameterValue("HIGH")->load();
     // IR data id
@@ -320,17 +373,37 @@ void GgconvolverAudioProcessor::updateParams() {
     String irName = BinaryData::namedResourceList[mIrNumber];
     mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), mIrSize);
 
+    // Inform editor that parameters have been changed, in case the editor wants to do something
+    sendChangeMessage();
+}
 
-    // Test inherit ChangeBroadcaster and send sendChangeMessage();
-    // In editor: inherit ChangeListener and implement changeListenerCallback() which calls processor.createFrequencyPlot() which 
-    // returns a Path& 
+const std::vector<double>& GgconvolverAudioProcessor::getMagnitudes()
+{
+    return mMagnitudes;
+}
 
-    //Testing
-    // Update mMagnitudes
-    //dsp::IIR::Coefficients<float>::Ptr newCoefficients;
-    //newCoefficients = dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain);
-    //newCoefficients->getMagnitudeForFrequencyArray(mFrequencies.data(),
-    //    mMagnitudes.data(),
-    //    mFrequencies.size(), getSampleRate());
+// Called by the editor component to update Path
+void GgconvolverAudioProcessor::createFrequencyPlot(Path & p, const std::vector<double> & mags, const Rectangle<int> bounds, float pixelsPerDouble)
+{
  
+    mLowCoefficients = dsp::IIR::Coefficients<float>::makeLowShelf(getSampleRate(), Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain);
+    mHighCoefficients = dsp::IIR::Coefficients<float>::makeHighShelf(getSampleRate(), Constant::highShelfFrequency, Constant::highShelfFilterQ, mHighShelfGain);
+    mMidCoefficients = dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain);
+    mLowCoefficients->getMagnitudeForFrequencyArray(mFrequencies.data(), mLowMagnitudes.data(), mFrequencies.size(), getSampleRate());
+    mMidCoefficients->getMagnitudeForFrequencyArray(mFrequencies.data(), mMidMagnitudes.data(), mFrequencies.size(), getSampleRate());
+    mHighCoefficients->getMagnitudeForFrequencyArray(mFrequencies.data(), mHighMagnitudes.data(), mFrequencies.size(), getSampleRate());
+
+    std::fill(mMagnitudes.begin(), mMagnitudes.end(), mOutLevel);
+    // Multiply the magnitudes to get a magnitude for all three 
+    FloatVectorOperations::multiply(mMagnitudes.data(), mLowMagnitudes.data(), static_cast<int> (mMidMagnitudes.size()));
+    FloatVectorOperations::multiply(mMagnitudes.data(), mMidMagnitudes.data(), static_cast<int> (mMidMagnitudes.size()));
+    FloatVectorOperations::multiply(mMagnitudes.data(), mHighMagnitudes.data(), static_cast<int> (mMidMagnitudes.size()));
+
+    p.startNewSubPath(bounds.getX(), mags[0] > 0 ? float(bounds.getCentreY() - pixelsPerDouble * std::log(mags[0]) / std::log(2)) : bounds.getBottom());
+    const double xFactor = static_cast<double> (bounds.getWidth()) / mFrequencies.size();
+    for (size_t i = 1; i < mFrequencies.size(); ++i)
+    {
+        p.lineTo(float(bounds.getX() + i * xFactor), 
+            float(mags[i] > 0 ? bounds.getCentreY() - pixelsPerDouble * std::log(mags[i]) / std::log(2) : bounds.getBottom()));
+    }
 }

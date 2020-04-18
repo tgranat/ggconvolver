@@ -17,15 +17,16 @@
 //==============================================================================
 /*
 */
-class EQComponent    : public Component
+class EQComponent    : public Component,
+                       public ChangeListener
 {
 public:
     EQComponent(GgconvolverAudioProcessor& p);
     ~EQComponent();
 
     void paint (Graphics&) override;
- 
     void resized() override;
+    void changeListenerCallback(ChangeBroadcaster* sender) override;
 
     Path frequencyResponse;
 

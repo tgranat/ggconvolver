@@ -14,6 +14,9 @@
 //==============================================================================
 EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
 {
+    // Listener for change messages from plugin processor
+    processor.addChangeListener(this);
+
     Font controlFont("Ariel", 13.0f, Font::plain);
 
     basicLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::blue);
@@ -28,7 +31,7 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
     // LEVEL SLIDER
     levelSlider.setSliderStyle(Slider::RotaryVerticalDrag);
     levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    //levelSlider.setPopupDisplayEnabled(true, false, this);
+    levelSlider.setPopupDisplayEnabled(true, false, this);
     levelSlider.setLookAndFeel(&basicLookAndFeel);
     addAndMakeVisible(levelSlider);
     mLevelAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "LEVEL", levelSlider);
@@ -42,9 +45,8 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
 
     // LOW SHELF SLIDER
     lowSlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    // Don't show text box with values
     lowSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    //lowSlider.setPopupDisplayEnabled(true, false, this);
+    lowSlider.setPopupDisplayEnabled(true, false, this);
     lowSlider.setLookAndFeel(&lowSliderLookAndFeel);
     addAndMakeVisible(lowSlider);
     mLowAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "LOW", lowSlider);
@@ -58,9 +60,8 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
 
     // MID PEAK SLIDER
     midSlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    // Don't show text box with values
     midSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    //midSlider.setPopupDisplayEnabled(true, false, this);
+    midSlider.setPopupDisplayEnabled(true, false, this);
     midSlider.setLookAndFeel(&midLookAndFeel);
     addAndMakeVisible(midSlider);
     mMidAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "MID", midSlider);
@@ -74,11 +75,8 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
 
     // MID FREQUENCY SLIDER
     midFrequencySlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    // Don't show text box with values
     midFrequencySlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    //midFrequency.addListener(this);
     midFrequencySlider.setPopupDisplayEnabled(true, false, this);
-    midFrequencySlider.setTextValueSuffix(" Hz");
     midFrequencySlider.setLookAndFeel(&midLookAndFeel);
     addAndMakeVisible(midFrequencySlider);
     mMidFreqencyAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "MID FREQ", midFrequencySlider);
@@ -103,21 +101,16 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
     addAndMakeVisible(midBw1OctButton);
     mBandwidth1Attachement = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.getAPVTS(), "BANDWIDTH1", midBw1OctButton);
 
-
     midBwLabel.setFont(controlFont);
     midBwLabel.setText("BW", dontSendNotification);
     midBwLabel.setJustificationType(Justification::centredBottom);
     midBwLabel.attachToComponent(&midBw1OctButton, false);
     addAndMakeVisible(midBwLabel);
 
-
     // HIGH SHELF SLIDER
     highSlider.setSliderStyle(Slider::RotaryVerticalDrag);
-    highSlider.setRange(0.05f, 1.95f, 0.01);
-    highSlider.setValue(1.f);
-    // Don't show text box with values
     highSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-    //highSlider.setPopupDisplayEnabled(true, false, this);
+    highSlider.setPopupDisplayEnabled(true, false, this);
     highSlider.setLookAndFeel(&lowSliderLookAndFeel);
     addAndMakeVisible(highSlider);
     mHighAttachement = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.getAPVTS(), "HIGH", highSlider);
@@ -129,49 +122,14 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
     highLabel.setJustificationType(Justification::centredBottom);
     highLabel.attachToComponent(&highSlider, false);
     addAndMakeVisible(highLabel);
+
+    updateFrequencyResponses();
 }
 
 EQComponent::~EQComponent()
 {
 }
 
-void EQComponent::paint (Graphics& g)
-{
-    g.setColour(Colours::white);
-    // Paint frames for the level and eq controls
-    paintFrame(10, 50, g);
-    paintFrame(10 + 60, 50, g);
-    paintFrame(10 + 220, 50, g);
-    paintFrameWide(10 + 140, 50, g);
-    mIrFrame = getLocalBounds().reduced(3, 3);
-    mPlotFrame = mIrFrame.withTrimmedTop(140);
-    g.drawRect(mIrFrame);
-    g.drawRect(mPlotFrame);
-
-    // Paint frequency and dB grid
-    g.setFont(Font("Ariel", 9.0f, Font::plain));
-    for (int i = 0; i < 10; ++i) {
-        g.setColour(Colours::silver.withAlpha(0.3f));
-        auto x = mPlotFrame.getX() + mPlotFrame.getWidth() * i * 0.1f;
-        if (i > 0) g.drawVerticalLine(roundToInt(x), mPlotFrame.getY(), mPlotFrame.getBottom());
-
-        g.setColour(Colours::silver);
-        auto freq = getFrequencyForPosition(i * 0.1f);
-        g.drawFittedText((freq < 1000) ? String(freq) + " Hz" : String(freq / 1000, 1) + " kHz",
-            roundToInt(x + 3), mPlotFrame.getBottom() - 18, 50, 15, Justification::left, 1);
-    }
-    g.setColour(Colours::silver.withAlpha(0.3f));
-    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.25 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
-    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.5 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
-    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.75 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
-
-    g.setColour(Colours::silver);
-    g.drawFittedText( "12 dB", mPlotFrame.getX() + 3, mPlotFrame.getY() + 2, 50, 14, Justification::left, 1);
-    g.drawFittedText("6 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.25 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
-    g.drawFittedText(" 0 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.5 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
-    g.drawFittedText("6 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.75 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
-
-}
 
 float EQComponent::getFrequencyForPosition(float pos)
 {
@@ -203,6 +161,9 @@ void EQComponent::paintFrameWide(float sx, float sy, Graphics& g) {
 
 void EQComponent::resized()
 {
+    mIrFrame = getLocalBounds().reduced(3, 3);
+    mPlotFrame = mIrFrame.withTrimmedTop(140);
+
     int sliderLeft = 10;
     int sliderRow = 25;
     int w = 50;
@@ -219,7 +180,59 @@ void EQComponent::resized()
     updateFrequencyResponses();
 }
 
+void EQComponent::paint(Graphics& g)
+{
+    g.setColour(Colours::white);
+    // Paint frames for the level and eq controls
+    paintFrame(10, 50, g);
+    paintFrame(10 + 60, 50, g);
+    paintFrame(10 + 220, 50, g);
+    paintFrameWide(10 + 140, 50, g);
+    g.drawRect(mIrFrame);
+    //g.drawRect(mPlotFrame);
+
+    // Paint frequency and dB grid
+    g.setFont(Font("Ariel", 9.0f, Font::plain));
+    for (int i = 0; i < 10; ++i) {
+        g.setColour(Colours::silver.withAlpha(0.3f));
+        auto x = mPlotFrame.getX() + mPlotFrame.getWidth() * i * 0.1f;
+        if (i > 0) g.drawVerticalLine(roundToInt(x), mPlotFrame.getY(), mPlotFrame.getBottom());
+
+        g.setColour(Colours::silver);
+        auto freq = getFrequencyForPosition(i * 0.1f);
+        g.drawFittedText((freq < 1000) ? String(freq) + " Hz" : String(freq / 1000, 1) + " kHz",
+            roundToInt(x + 3), mPlotFrame.getBottom() - 18, 50, 15, Justification::left, 1);
+    }
+    g.setColour(Colours::silver.withAlpha(0.3f));
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY()), mPlotFrame.getX(), mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.25 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.5 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.75 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
+
+    g.setColour(Colours::silver);
+    float maxDb = processor.getMaxDb();
+    g.drawFittedText(String(maxDb) + " dB", mPlotFrame.getX() + 3, mPlotFrame.getY() + 2, 50, 14, Justification::left, 1);
+    g.drawFittedText(String(maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.25 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+    g.drawFittedText(" 0 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.5 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+    g.drawFittedText(String(-maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.75 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+
+    g.setColour(Colours::silver);
+    g.strokePath(frequencyResponse, PathStrokeType(1.0));
+}
+
+
+void EQComponent::changeListenerCallback(ChangeBroadcaster* sender)
+{
+    ignoreUnused(sender); // To avoid warnings
+    updateFrequencyResponses();
+    repaint();
+}
 void EQComponent::updateFrequencyResponses() {
 
+    auto pixelsPerDouble =  mPlotFrame.getHeight() / Decibels::decibelsToGain(processor.getMaxDb());
+    // Clear the Path
+    frequencyResponse.clear();
+    // Call the plugin processor that creates a Path based on its data
+    processor.createFrequencyPlot(frequencyResponse, processor.getMagnitudes(), mPlotFrame, pixelsPerDouble);
 }
 
