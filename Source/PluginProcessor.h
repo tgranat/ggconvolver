@@ -1,9 +1,7 @@
 /*
   ==============================================================================
 
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
+    Simple Speaker Simulator (ggconvolver) processor
 
   ==============================================================================
 */
@@ -20,14 +18,15 @@ namespace Constant {
     const float lowShelfFilterQ = 0.667f;
     const float lowShelfFrequency = 100.f;
     const float midPeakFilterQ = 1.141f;
-    const float midPeakFrequencyLow = 200.f;
-    const float midPeakFrequencyHigh = 4000.f;
+    const float midPeakFrequencyLow = 100.f;
+    const float midPeakFrequencyHigh = 5000.f;
     const float midPeakFrequency = 1000.f;
     const float highShelfFilterQ = 0.667f;
     const float highShelfFrequency = 6000.f;
     const float oneOctaveQ = 1.141f;
     const float twoOctavesQ = 0.667f;
-    const float maxDb = 12.f;
+    const float maxDb = 12.f;                     // Max level dB in graph
+    const float maxParameterGain = 12.f;          // Max/min gain in sliders
 }
 //==============================================================================
 /**

@@ -1,9 +1,7 @@
 /*
   ==============================================================================
 
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
+   Implementation of Simple Speaker Simulator (ggconvolver)
 
   ==============================================================================
 */
@@ -277,7 +275,7 @@ AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createP
 
     // How to get gain parameters handle dB nicely is inspired by https://github.com/ffAudio/Frequalizer
 
-    const float maxGain = Decibels::decibelsToGain(Constant::maxDb);
+    const float maxGain = Decibels::decibelsToGain(Constant::maxParameterGain);
     parameters.push_back(std::make_unique<AudioParameterFloat>("LEVEL", "Level",
         NormalisableRange<float> {1.0f / maxGain, maxGain, 0.001f,
         std::log(0.5f) / std::log((1.0f - (1.0f / maxGain)) / (maxGain - (1.0f / maxGain)))},
@@ -385,25 +383,30 @@ const std::vector<double>& GgconvolverAudioProcessor::getMagnitudes()
 // Called by the editor component to update Path
 void GgconvolverAudioProcessor::createFrequencyPlot(Path & p, const std::vector<double> & mags, const Rectangle<int> bounds, float pixelsPerDouble)
 {
- 
     mLowCoefficients = dsp::IIR::Coefficients<float>::makeLowShelf(getSampleRate(), Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain);
     mHighCoefficients = dsp::IIR::Coefficients<float>::makeHighShelf(getSampleRate(), Constant::highShelfFrequency, Constant::highShelfFilterQ, mHighShelfGain);
     mMidCoefficients = dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain);
     mLowCoefficients->getMagnitudeForFrequencyArray(mFrequencies.data(), mLowMagnitudes.data(), mFrequencies.size(), getSampleRate());
     mMidCoefficients->getMagnitudeForFrequencyArray(mFrequencies.data(), mMidMagnitudes.data(), mFrequencies.size(), getSampleRate());
     mHighCoefficients->getMagnitudeForFrequencyArray(mFrequencies.data(), mHighMagnitudes.data(), mFrequencies.size(), getSampleRate());
-
+    // Set outlevel as entry magnitude
     std::fill(mMagnitudes.begin(), mMagnitudes.end(), mOutLevel);
-    // Multiply the magnitudes to get a magnitude for all three 
+    // Multiply the magnitudes to get a magnitude for all three filter
     FloatVectorOperations::multiply(mMagnitudes.data(), mLowMagnitudes.data(), static_cast<int> (mMidMagnitudes.size()));
     FloatVectorOperations::multiply(mMagnitudes.data(), mMidMagnitudes.data(), static_cast<int> (mMidMagnitudes.size()));
     FloatVectorOperations::multiply(mMagnitudes.data(), mHighMagnitudes.data(), static_cast<int> (mMidMagnitudes.size()));
 
-    p.startNewSubPath(bounds.getX(), mags[0] > 0 ? float(bounds.getCentreY() - pixelsPerDouble * std::log(mags[0]) / std::log(2)) : bounds.getBottom());
+    float yPos = float(mags[0] > 0 ? bounds.getCentreY() - pixelsPerDouble * std::log(mags[0]) / std::log(2) : bounds.getBottom());
+    if (yPos < bounds.getY()) yPos = bounds.getY();
+    if (yPos > bounds.getBottom()) yPos = bounds.getBottom();
+    p.startNewSubPath(bounds.getX(), yPos);
     const double xFactor = static_cast<double> (bounds.getWidth()) / mFrequencies.size();
+
     for (size_t i = 1; i < mFrequencies.size(); ++i)
     {
-        p.lineTo(float(bounds.getX() + i * xFactor), 
-            float(mags[i] > 0 ? bounds.getCentreY() - pixelsPerDouble * std::log(mags[i]) / std::log(2) : bounds.getBottom()));
+        yPos = float(mags[i] > 0 ? bounds.getCentreY() - pixelsPerDouble * std::log(mags[i]) / std::log(2) : bounds.getBottom());
+        if (yPos < bounds.getY()) yPos = bounds.getY();
+        if (yPos > bounds.getBottom()) yPos = bounds.getBottom();
+        p.lineTo(float(bounds.getX() + i * xFactor), yPos);
     }
 }

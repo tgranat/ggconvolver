@@ -128,6 +128,7 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
 
 EQComponent::~EQComponent()
 {
+    processor.removeChangeListener(this);
 }
 
 
@@ -145,7 +146,7 @@ void EQComponent::paintFrame(float sx, float sy, Graphics& g) {
     path.startNewSubPath(sx + 50, sy + 55);
     path.lineTo(sx + 50, sy - 10);
     path.lineTo(sx + 45, sy - 10);
-    g.strokePath(path, PathStrokeType(2.0f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::square));
+    g.strokePath(path, PathStrokeType(1.5f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::square));
 }
 
 void EQComponent::paintFrameWide(float sx, float sy, Graphics& g) {
@@ -156,7 +157,7 @@ void EQComponent::paintFrameWide(float sx, float sy, Graphics& g) {
     path.startNewSubPath(sx + 45, sy - 10);
     path.lineTo(sx + 70, sy - 10);
     path.lineTo(sx + 70, sy + 55);
-    g.strokePath(path, PathStrokeType(2.0f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::square));
+    g.strokePath(path, PathStrokeType(1.5f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::square));
 }
 
 void EQComponent::resized()
@@ -184,10 +185,10 @@ void EQComponent::paint(Graphics& g)
 {
     g.setColour(Colours::white);
     // Paint frames for the level and eq controls
-    paintFrame(10, 50, g);
-    paintFrame(10 + 60, 50, g);
-    paintFrame(10 + 220, 50, g);
-    paintFrameWide(10 + 140, 50, g);
+    paintFrame(10, 25, g);
+    paintFrame(10 + 60, 25, g);
+    paintFrame(10 + 220, 25, g);
+    paintFrameWide(10 + 140, 25, g);
     g.drawRect(mIrFrame);
     //g.drawRect(mPlotFrame);
 
@@ -216,7 +217,7 @@ void EQComponent::paint(Graphics& g)
     g.drawFittedText(" 0 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.5 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
     g.drawFittedText(String(-maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.75 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
 
-    g.setColour(Colours::silver);
+    g.setColour(Colours::red);
     g.strokePath(frequencyResponse, PathStrokeType(1.0));
 }
 
