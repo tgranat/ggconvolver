@@ -9,13 +9,19 @@ hard code the IRs (other than to learn plugin development with JUCE) is that I a
 have several plugins where I can load IR files. I wanted a simple speaker plugin that
 suits me and works out of the box.
 
-I have added some EQ and parameter settings are also stored so they are saved when the
-DAW project is saved.
-
 I have only tested the plugin on Reaper.
 
-Todo/Work in progress:
+v0.1:
+* Basic convolving with hardcoded impulse responses.
+* Equalizer with low and high shelf filter and mid filter with variable frequency and bandwidth.
+* Parameters are stored so they are saved when the DAW project is saved.
 
-Would like some VU meters (like I have in the https://github.com/tgranat/vstplugin_dev/tree/master/ggconvolver that I made using the VST SDK)
+This version under development:
+* Fancy graph plotting the EQ curve to visualize the EQ settings
 
-Do some refactoring.
+Todo:
+
+* Would like some VU meters (like I have in the https://github.com/tgranat/vstplugin_dev/tree/master/ggconvolver that I made using the VST SDK)
+* Add more bandwidth options. Will probably use a dropdown instead of radio buttons
+* Plot the frequency response for the loaded IR
+* In the future: load IR from file (but keep hardcoded options)
