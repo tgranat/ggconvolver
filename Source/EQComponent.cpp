@@ -162,8 +162,8 @@ void EQComponent::paintFrameWide(float sx, float sy, Graphics& g) {
 
 void EQComponent::resized()
 {
-    mIrFrame = getLocalBounds().reduced(3, 3);
-    mPlotFrame = mIrFrame.withTrimmedTop(140);
+    mEqFrame = getLocalBounds().reduced(2, 2);
+    mPlotFrame = mEqFrame.withTrimmedTop(140);
 
     int sliderLeft = 10;
     int sliderRow = 25;
@@ -189,7 +189,7 @@ void EQComponent::paint(Graphics& g)
     paintFrame(10 + 60, 25, g);
     paintFrame(10 + 220, 25, g);
     paintFrameWide(10 + 140, 25, g);
-    g.drawRect(mIrFrame);
+    g.drawRect(mEqFrame);
     //g.drawRect(mPlotFrame);
 
     // Paint frequency and dB grid

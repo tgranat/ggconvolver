@@ -34,7 +34,7 @@ IRComponent::~IRComponent()
 void IRComponent::paint (Graphics& g)
 {
     g.setColour(Colours::white);
-    mIrFrame = getLocalBounds().reduced(3, 3);
+    mIrFrame = getLocalBounds().reduced(2, 2);
     g.drawRect(mIrFrame);
 }
 

@@ -64,7 +64,7 @@ private:
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth1Attachement;
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> mBandwidth2Attachement;
 
-    Rectangle<int> mIrFrame;
+    Rectangle<int> mEqFrame;
     Rectangle<int> mPlotFrame;
 
     GgconvolverAudioProcessor& processor;

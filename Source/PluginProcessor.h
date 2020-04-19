@@ -22,7 +22,7 @@ namespace Constant {
     const float midPeakFrequencyHigh = 5000.f;
     const float midPeakFrequency = 1000.f;
     const float highShelfFilterQ = 0.667f;
-    const float highShelfFrequency = 6000.f;
+    const float highShelfFrequency = 5000.f;
     const float oneOctaveQ = 1.141f;
     const float twoOctavesQ = 0.667f;
     const float maxDb = 12.f;                     // Max level dB in graph

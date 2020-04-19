@@ -201,19 +201,21 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     }
 
     // Update filters that have been updated in gui
+    // Low shelf
      if (mLowShelfGain != mCurrentLowShelfGain) {
         for (int channel = 0; channel < totalNumInputChannels; ++channel) {
             mLowShelfFilters[channel].setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
         }
         mCurrentLowShelfGain = mLowShelfGain;
     }
+    // High shelf
     if (mHighShelfGain != mCurrentHighShelfGain) {
         for (int channel = 0; channel < totalNumInputChannels; ++channel) {
             mHighShelfFilters[channel].setCoefficients(IIRCoefficients::makeHighShelf(getSampleRate(), Constant::highShelfFrequency, Constant::highShelfFilterQ, mHighShelfGain));
         }
         mCurrentHighShelfGain = mHighShelfGain;
     }
-
+    // Mid
     if (mMidPeakFrequency != mCurrentMidPeakFrequency || mMidPeakQ != mCurrentMidPeakQ || mMidPeakGain != mCurrentMidPeakGain) {
         for (int channel = 0; channel < totalNumInputChannels; ++channel) {
             mMidPeakFilters[channel].setCoefficients(IIRCoefficients::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain));
@@ -226,6 +228,7 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 
     // Apply output level + compensating gain to achieve that the perceived loudness sounds good (to me)
     buffer.applyGain(mOutLevel * Constant::compensatingOutGain);
+    //float postRMSLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
 }
 
 //==============================================================================
