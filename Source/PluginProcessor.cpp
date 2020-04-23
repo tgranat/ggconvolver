@@ -48,29 +48,17 @@ const String GgconvolverAudioProcessor::getName() const
 
 bool GgconvolverAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
-    return true;
-   #else
     return false;
-   #endif
 }
 
 bool GgconvolverAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
-    return true;
-   #else
     return false;
-   #endif
 }
 
 bool GgconvolverAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
-    return true;
-   #else
     return false;
-   #endif
 }
 
 double GgconvolverAudioProcessor::getTailLengthSeconds() const
@@ -145,10 +133,6 @@ void GgconvolverAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool GgconvolverAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    ignoreUnused (layouts);
-    return true;
-  #else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
@@ -156,13 +140,10 @@ bool GgconvolverAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
         return false;
 
     // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
 
     return true;
-  #endif
 }
 #endif
 

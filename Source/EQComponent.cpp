@@ -233,7 +233,7 @@ void EQComponent::updateFrequencyResponses() {
     auto pixelsPerDouble =  mPlotFrame.getHeight() / Decibels::decibelsToGain(processor.getMaxDb());
     // Clear the Path
     frequencyResponse.clear();
-    // Call the plugin processor that creates a Path based on its data
+    // Call the plugin processor that creates a Path based plugin processor data
     processor.createFrequencyPlot(frequencyResponse, processor.getMagnitudes(), mPlotFrame, pixelsPerDouble);
 }
 
