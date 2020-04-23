@@ -193,39 +193,9 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     dsp::ProcessContextReplacing<float> context(block);
     mConvolution.process(context);
 
-    // Process filters
-    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
-        mLowShelfFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
-        mMidPeakFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
-        mHighShelfFilters[channel].processSamples(buffer.getWritePointer(channel), buffer.getNumSamples());
-    }
-
-    // Update filters that have been updated in gui
-    // Low shelf
-     if (mLowShelfGain != mCurrentLowShelfGain) {
-        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
-            mLowShelfFilters[channel].setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
-        }
-        mCurrentLowShelfGain = mLowShelfGain;
-    }
-    // High shelf
-    if (mHighShelfGain != mCurrentHighShelfGain) {
-        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
-            mHighShelfFilters[channel].setCoefficients(IIRCoefficients::makeHighShelf(getSampleRate(), Constant::highShelfFrequency, Constant::highShelfFilterQ, mHighShelfGain));
-        }
-        mCurrentHighShelfGain = mHighShelfGain;
-    }
-    // Mid
-    if (mMidPeakFrequency != mCurrentMidPeakFrequency || mMidPeakQ != mCurrentMidPeakQ || mMidPeakGain != mCurrentMidPeakGain) {
-        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
-            mMidPeakFilters[channel].setCoefficients(IIRCoefficients::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain));
-
-        }
-        mCurrentMidPeakFrequency = mMidPeakFrequency;
-        mCurrentMidPeakQ = mMidPeakQ;
-        mCurrentMidPeakGain = mMidPeakGain;
-    }
-
+    // Apply filters
+    processFilters(&buffer, totalNumInputChannels);
+ 
     // Apply output level + compensating gain to achieve that the perceived loudness sounds good (to me)
     buffer.applyGain(mOutLevel * Constant::compensatingOutGain);
     //float postRMSLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
@@ -270,7 +240,8 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 // Initiate/update convolution engine with parameters set by GUI
 void GgconvolverAudioProcessor::updateConvolution() {
     mConvolution.reset();
-    mConvolution.loadImpulseResponse(mIrData, mIrSize, true, false, 0, true);
+    // 0 means no limit for original impulse response size
+    mConvolution.loadImpulseResponse(mIrData, mIrSize, false, false, 0, true);
 }
 
 AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createParameters() {
@@ -378,6 +349,41 @@ void GgconvolverAudioProcessor::updateParams() {
     sendChangeMessage();
 }
 
+void GgconvolverAudioProcessor::processFilters(AudioBuffer<float>* buffer, int totalNumInputChannels) {
+    // Process filters
+    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+        mLowShelfFilters[channel].processSamples(buffer->getWritePointer(channel), buffer->getNumSamples());
+        mMidPeakFilters[channel].processSamples(buffer->getWritePointer(channel), buffer->getNumSamples());
+        mHighShelfFilters[channel].processSamples(buffer->getWritePointer(channel), buffer->getNumSamples());
+    }
+
+    // Update filters that have been updated in gui
+    // Low shelf
+    if (mLowShelfGain != mCurrentLowShelfGain) {
+        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+            mLowShelfFilters[channel].setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), Constant::lowShelfFrequency, Constant::lowShelfFilterQ, mLowShelfGain));
+        }
+        mCurrentLowShelfGain = mLowShelfGain;
+    }
+    // High shelf
+    if (mHighShelfGain != mCurrentHighShelfGain) {
+        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+            mHighShelfFilters[channel].setCoefficients(IIRCoefficients::makeHighShelf(getSampleRate(), Constant::highShelfFrequency, Constant::highShelfFilterQ, mHighShelfGain));
+        }
+        mCurrentHighShelfGain = mHighShelfGain;
+    }
+    // Mid
+    if (mMidPeakFrequency != mCurrentMidPeakFrequency || mMidPeakQ != mCurrentMidPeakQ || mMidPeakGain != mCurrentMidPeakGain) {
+        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+            mMidPeakFilters[channel].setCoefficients(IIRCoefficients::makePeakFilter(getSampleRate(), mMidPeakFrequency, mMidPeakQ, mMidPeakGain));
+
+        }
+        mCurrentMidPeakFrequency = mMidPeakFrequency;
+        mCurrentMidPeakQ = mMidPeakQ;
+        mCurrentMidPeakGain = mMidPeakGain;
+    }
+
+}
 const std::vector<double>& GgconvolverAudioProcessor::getMagnitudes()
 {
     return mMagnitudes;

@@ -73,7 +73,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    const std::vector<double>& getMagnitudes();
+	const std::vector<double>& getMagnitudes();
     
     void createFrequencyPlot(Path& p, const std::vector<double>& mags, const Rectangle<int> bounds, float pixelsPerDouble);
 
@@ -112,6 +112,7 @@ private:
     AudioProcessorValueTreeState::ParameterLayout createParameters();
     void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
     void updateParams();
+    void processFilters(AudioBuffer<float>* buffer, int totalNumInputChannels);
 
     dsp::Convolution mConvolution;
 
