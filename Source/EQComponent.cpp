@@ -17,6 +17,8 @@ EQComponent::EQComponent(GgconvolverAudioProcessor& p) : processor(p)
     // Listener for change messages from plugin processor
     processor.addChangeListener(this);
 
+    startTimerHz(30);
+
     Font controlFont("Ariel", 13.0f, Font::plain);
 
     basicLookAndFeel.setColour(LookAndFeelHelp::ColourTarget::tip, Colours::blue);
