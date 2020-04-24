@@ -38,6 +38,7 @@ GgconvolverAudioProcessor::GgconvolverAudioProcessor()
 
 GgconvolverAudioProcessor::~GgconvolverAudioProcessor()
 {
+    outputAnalyser.stopThread(1000);
 }
 
 //==============================================================================
@@ -118,7 +119,7 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // Set first impulse response
     updateConvolution();
     mCurrentIrLoaded = mIrNumber;
-
+    outputAnalyser.setupAnalyser(int(sampleRate), float(sampleRate));
 }
 
 // Called when plugin removed (not when only disabled)
@@ -126,8 +127,7 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 // Same as VST AudioEffect::setActive(0)
 void GgconvolverAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    outputAnalyser.stopThread(1000);
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -157,8 +157,8 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
         buffer.clear(i, 0, buffer.getNumSamples());
 
     if (mParamsHaveBeenUpdatedInGUI) {
-       updateParams();
-       mParamsHaveBeenUpdatedInGUI = false;
+        updateParams();
+        mParamsHaveBeenUpdatedInGUI = false;
     }
 
     // Update IR if it has been changed in GUI
@@ -176,10 +176,14 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 
     // Apply filters
     processFilters(&buffer, totalNumInputChannels);
- 
+
     // Apply output level + compensating gain to achieve that the perceived loudness sounds good (to me)
     buffer.applyGain(mOutLevel * Constant::compensatingOutGain);
     //float postRMSLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
+
+    if (getActiveEditor() != nullptr) {
+        outputAnalyser.addAudioData(buffer, 0, getTotalNumOutputChannels());
+    }
 }
 
 //==============================================================================
@@ -400,3 +404,13 @@ void GgconvolverAudioProcessor::createFrequencyPlot(Path & p, const std::vector<
         p.lineTo(float(bounds.getX() + i * xFactor), yPos);
     }
 }
+void GgconvolverAudioProcessor::createAnalyserPlot(Path& p, const Rectangle<int> bounds, float minFreq)
+{
+    outputAnalyser.createPath(p, bounds.toFloat(), minFreq);
+}
+
+bool GgconvolverAudioProcessor::checkForNewAnalyserData()
+{
+    return outputAnalyser.checkForNewData();
+}
+

@@ -18,7 +18,8 @@
 /*
 */
 class EQComponent    : public Component,
-                       public ChangeListener
+                       public ChangeListener,
+                       public Timer
 {
 public:
     EQComponent(GgconvolverAudioProcessor& p);
@@ -27,8 +28,10 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     void changeListenerCallback(ChangeBroadcaster* sender) override;
+    void timerCallback() override;
 
-    Path frequencyResponse;
+    Path frequencyResponsePath;
+    Path analyserPath;
 
 private:
     void paintFrame(float x, float y, Graphics& g);

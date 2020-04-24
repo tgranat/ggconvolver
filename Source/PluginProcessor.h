@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Analyser.h"
 
 namespace Constant {
     // Compensate for lost level in convolver. Seems to lose 50% in convolver.
@@ -77,6 +78,9 @@ public:
     
     void createFrequencyPlot(Path& p, const std::vector<double>& mags, const Rectangle<int> bounds, float pixelsPerDouble);
 
+    void createAnalyserPlot(Path& p, const Rectangle<int> bounds, float minFreq);
+    bool checkForNewAnalyserData();
+
     float getMaxDb() { return Constant::maxDb; }
 
     // UI parameters
@@ -113,6 +117,8 @@ private:
     void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
     void updateParams();
     void processFilters(AudioBuffer<float>* buffer, int totalNumInputChannels);
+
+    Analyser outputAnalyser;
 
     dsp::Convolution mConvolution;
 

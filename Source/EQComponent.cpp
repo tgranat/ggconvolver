@@ -218,7 +218,14 @@ void EQComponent::paint(Graphics& g)
     g.drawFittedText(String(-maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.75 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
 
     g.setColour(Colours::red);
-    g.strokePath(frequencyResponse, PathStrokeType(1.0));
+    g.strokePath(frequencyResponsePath, PathStrokeType(1.0));
+
+
+    processor.createAnalyserPlot(analyserPath, mPlotFrame, 20.0f);
+    g.setColour(Colours::blue);
+    //g.drawFittedText("Output", plotFrame.reduced(8, 28), Justification::topRight, 1);
+    g.strokePath(analyserPath, PathStrokeType(1.0));
+
 }
 
 
@@ -228,12 +235,19 @@ void EQComponent::changeListenerCallback(ChangeBroadcaster* sender)
     updateFrequencyResponses();
     repaint();
 }
+
+void EQComponent::timerCallback()
+{
+    if (processor.checkForNewAnalyserData())
+        repaint(mPlotFrame);
+}
+
 void EQComponent::updateFrequencyResponses() {
 
     auto pixelsPerDouble =  mPlotFrame.getHeight() / Decibels::decibelsToGain(processor.getMaxDb());
     // Clear the Path
-    frequencyResponse.clear();
+    frequencyResponsePath.clear();
     // Call the plugin processor that creates a Path based plugin processor data
-    processor.createFrequencyPlot(frequencyResponse, processor.getMagnitudes(), mPlotFrame, pixelsPerDouble);
+    processor.createFrequencyPlot(frequencyResponsePath, processor.getMagnitudes(), mPlotFrame, pixelsPerDouble);
 }
 

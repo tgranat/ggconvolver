@@ -6,6 +6,8 @@
               pluginManufacturer="GranatGuitar">
   <MAINGROUP id="x962nL" name="ggconvolver">
     <GROUP id="{2676E8B1-F534-FACC-2A3D-EE2653730B7F}" name="Source">
+      <FILE id="Al0FWF" name="Analyser.cpp" compile="1" resource="0" file="Source/Analyser.cpp"/>
+      <FILE id="rrOcgx" name="Analyser.h" compile="0" resource="0" file="Source/Analyser.h"/>
       <FILE id="JDhhDj" name="IRComponent.cpp" compile="1" resource="0" file="Source/IRComponent.cpp"/>
       <FILE id="LdDFbD" name="IRComponent.h" compile="0" resource="0" file="Source/IRComponent.h"/>
       <FILE id="OJLaHO" name="PluginProcessor.cpp" compile="1" resource="0"
