@@ -20,7 +20,7 @@ v0.1:
 * Equalizer with low and high shelf filter and mid filter with variable frequency and bandwidth.
 * Parameters are stored so they are saved when the DAW project is saved.
 
-This version under development:
+v0.2:
 * Fancy graph plotting the EQ curve to visualize the EQ settings
 * Output frequency analyser
 
