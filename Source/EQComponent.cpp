@@ -219,15 +219,13 @@ void EQComponent::paint(Graphics& g)
     g.drawFittedText(" 0 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.5 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
     g.drawFittedText(String(-maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.75 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
 
-    g.setColour(Colours::red);
-    g.strokePath(frequencyResponsePath, PathStrokeType(1.0));
-
-
     processor.createAnalyserPlot(analyserPath, mPlotFrame, 20.0f);
-    g.setColour(Colours::blue);
-    //g.drawFittedText("Output", plotFrame.reduced(8, 28), Justification::topRight, 1);
+    g.setColour(Colours::blue.withAlpha(0.4f));
+    g.fillPath(analyserPath);
     g.strokePath(analyserPath, PathStrokeType(1.0));
 
+    g.setColour(Colours::red);
+    g.strokePath(frequencyResponsePath, PathStrokeType(1.0));
 }
 
 
@@ -240,8 +238,9 @@ void EQComponent::changeListenerCallback(ChangeBroadcaster* sender)
 
 void EQComponent::timerCallback()
 {
-    if (processor.checkForNewAnalyserData())
+    if (processor.checkForNewAnalyserData()) {
         repaint(mPlotFrame);
+    }
 }
 
 void EQComponent::updateFrequencyResponses() {
