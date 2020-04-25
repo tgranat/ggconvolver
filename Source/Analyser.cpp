@@ -4,7 +4,7 @@
     Analyser.cpp
     Created: 24 Apr 2020 2:46:29pm
 
-    Based on Analyser class from Frequaliser by Daniel Walz
+    Based on (=copied with some minor changes) Analyser class from the Frequaliser by Daniel Walz
     https://github.com/ffAudio/Frequalizer
 
   ==============================================================================
@@ -87,8 +87,11 @@ void Analyser::createPath(Path& p, const Rectangle<float> bounds, float minFreq)
     const auto  factor = bounds.getWidth() / 10.0f;
 
     p.startNewSubPath(bounds.getX() + factor * indexToX(0, minFreq), binToY(fftData[0], bounds));
-    for (int i = 0; i < averager.getNumSamples(); ++i)
-        p.lineTo(bounds.getX() + factor * indexToX(i, minFreq), binToY(fftData[i], bounds));
+    for (int i = 0; i < averager.getNumSamples(); ++i) {
+        p.lineTo(bounds.getX() + factor * indexToX(i, minFreq),  binToY(fftData[i], bounds));
+        //++i; // fix to only plot every other value
+    }
+
 }
 
 bool Analyser::checkForNewData()
