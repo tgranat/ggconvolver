@@ -147,12 +147,16 @@ bool GgconvolverAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
+// If signal is muted, processBlock isn't called (Reaper)
 void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
+    ignoreUnused(midiMessages);
+
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
+    // Clear output channels if there are more than input channels 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
@@ -166,8 +170,6 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
         updateConvolution();
         mCurrentIrLoaded = mIrNumber;
     }
-
-    //float preRMSLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
 
     // Process impulse response
     dsp::AudioBlock<float> block(buffer);
