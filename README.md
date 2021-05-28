@@ -26,6 +26,13 @@ v0.2:
 
 ### Todo
 
+Prio:
+* Move to JUCE6
+* Use Cmake to build
+* cppcheck
+* I'm having some problem where sometimes it gets distorted after a while. Check code for memory/buffer/other issues.
+
+Nice to have:
 * Would like some VU meters (like I have in the https://github.com/tgranat/vstplugin_dev/tree/master/ggconvolver that I made using the VST SDK)
 * Add more bandwidth options. Will probably use a dropdown instead of radio buttons
 * In the future: load IR from file (but keep hardcoded options)
