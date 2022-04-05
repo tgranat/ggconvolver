@@ -3,3 +3,4 @@ out/
 Builds/
 cmake-build/
 JuceLibraryCode/
+CMakeSettings.json
