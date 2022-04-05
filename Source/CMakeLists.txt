@@ -23,7 +23,7 @@ juce_add_plugin("${BaseTargetName}"
         PLUGIN_CODE GgOd
         FORMATS AU VST3 Standalone
         VST3_CATEGORIES
-        PRODUCT_NAME "Simple Speaker Simp")
+        PRODUCT_NAME "Simple Speaker Simulator")
 
 juce_generate_juce_header(${BaseTargetName})
 
