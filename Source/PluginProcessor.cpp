@@ -228,7 +228,7 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 void GgconvolverAudioProcessor::updateConvolution() {
     mConvolution.reset();
     // 0 means no limit for original impulse response size
-    mConvolution.loadImpulseResponse(mIrData, mIrSize, false, false, 0, true);
+    mConvolution.loadImpulseResponse(mIrData, mIrSize, dsp::Convolution::Stereo::no, dsp::Convolution::Trim::no, 0, dsp::Convolution::Normalise::yes);
 }
 
 AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createParameters() {

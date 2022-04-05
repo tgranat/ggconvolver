@@ -1,2 +1,5 @@
+out/
+.vs/
 Builds/
+cmake-build/
 JuceLibraryCode/
