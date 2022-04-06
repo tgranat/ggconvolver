@@ -111,7 +111,7 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     mCurrentMidPeakGain = mMidPeakGain;
 
     // Initialize convolution  
-    dsp::ProcessSpec spec;
+    dsp::ProcessSpec spec = {};
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getTotalNumInputChannels();
