@@ -30,7 +30,7 @@ void GgconvolverAudioProcessorEditor::paint (Graphics& g)
 {
     g.setColour(Colours::white);
     g.setFont(Font("Ariel", 15.0f, Font::bold));
-    g.drawFittedText("Simple Speaker Simulator", 0, 0, getWidth(), 30, Justification::centred, 1);
+    g.drawFittedText("Simple Speaker Simulator 0.3.0", 0, 0, getWidth(), 30, Justification::centred, 1);
  }
 
 void GgconvolverAudioProcessorEditor::resized()

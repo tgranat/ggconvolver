@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(GgConvolver VERSION 1.0.0)
+project(GgConvolver VERSION 0.3.0)
 
 #
 # https://forum.juce.com/t/native-built-in-cmake-support-in-juce/38700

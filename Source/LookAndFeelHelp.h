@@ -20,6 +20,7 @@ public:
     void drawRotarySlider(Graphics& g, int x, int y, int width, int height, float sliderPos,
         const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider) override
     {
+        (void) slider; // unused
         auto radius = jmin(width / 2, height / 2) - 8.0f;
         auto centreX = x + width * 0.5f;
         auto centreY = y + height * 0.5f;
@@ -49,6 +50,7 @@ public:
     // From LookAndFeel_V2
     void drawButtonText(Graphics& g, TextButton& button, bool isMouseOverButton, bool isButtonDown) override
     {
+        (void)isMouseOverButton; // unused
         auto font = getTextButtonFont(button, button.getHeight());
         g.setFont(font);
         g.setColour(button.findColour(button.getToggleState() ? TextButton::textColourOnId

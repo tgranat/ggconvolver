@@ -80,15 +80,19 @@ int GgconvolverAudioProcessor::getCurrentProgram()
 
 void GgconvolverAudioProcessor::setCurrentProgram (int index)
 {
+    (void)index; //unused
 }
 
 const String GgconvolverAudioProcessor::getProgramName (int index)
 {
+    (void)index; //unused
     return {};
 }
 
 void GgconvolverAudioProcessor::changeProgramName (int index, const String& newName)
 {
+    (void)index; //unused
+    (void)newName; //unused
 }
 
 //==============================================================================
@@ -299,7 +303,11 @@ AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createP
     return { parameters.begin(), parameters.end() };
 }
 
+// ValueTree::Listener
+// Called when a property of this tree (or of one of its sub-trees) is changed.
 void GgconvolverAudioProcessor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) {
+    (void)treeWhosePropertyHasChanged; // unused
+    (void)property; // unused
     mParamsHaveBeenUpdatedInGUI = true;
 }
 
