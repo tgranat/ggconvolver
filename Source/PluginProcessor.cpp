@@ -111,13 +111,8 @@ void GgconvolverAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     mCurrentMidPeakGain = mMidPeakGain;
 
     // Initialize convolution  
-    dsp::ProcessSpec spec = {};
-    spec.sampleRate = sampleRate;
-    spec.maximumBlockSize = samplesPerBlock;
-    spec.numChannels = getTotalNumInputChannels();
-    mConvolution.prepare(spec);
-    // Set first impulse response
-    updateConvolution();
+    // Set first impulse response (loadImpulseResponse() called)
+    updateConvolution(sampleRate, samplesPerBlock, getTotalNumInputChannels());
     mCurrentIrLoaded = mIrNumber;
     outputAnalyser.setupAnalyser(int(sampleRate), float(sampleRate));
 }
@@ -167,7 +162,7 @@ void GgconvolverAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 
     // Update IR if it has been changed in GUI
     if (mIrNumber != mCurrentIrLoaded) {
-        updateConvolution();
+        updateConvolution(getSampleRate(), getBlockSize(), getTotalNumInputChannels());
         mCurrentIrLoaded = mIrNumber;
     }
 
@@ -225,10 +220,14 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 }
 
 // Initiate/update convolution engine with parameters set by GUI
-void GgconvolverAudioProcessor::updateConvolution() {
+void GgconvolverAudioProcessor::updateConvolution(double sampleRate, juce::uint32 blockSize, juce::uint32 totalNumInputChannels) {
     mConvolution.reset();
     // 0 means no limit for original impulse response size
     mConvolution.loadImpulseResponse(mIrData, mIrSize, dsp::Convolution::Stereo::no, dsp::Convolution::Trim::no, 0, dsp::Convolution::Normalise::yes);
+    mSpec.sampleRate = sampleRate;
+    mSpec.maximumBlockSize = blockSize;
+    mSpec.numChannels = totalNumInputChannels;
+    mConvolution.prepare(mSpec);
 }
 
 AudioProcessorValueTreeState::ParameterLayout GgconvolverAudioProcessor::createParameters() {

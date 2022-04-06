@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#include <JuceHeader.h>
 #include "IRComponent.h"
+#include <BinaryData.h>
 
 //==============================================================================
 IRComponent::IRComponent(GgconvolverAudioProcessor& p) : processor(p)

@@ -110,7 +110,7 @@ public:
     AudioProcessorValueTreeState& getAPVTS() { return mAPVTS; }
 
 private:
-    void updateConvolution();
+    void updateConvolution(double sampleRate, juce::uint32 blockSize, juce::uint32 totalNumInputChannels);
     
     AudioProcessorValueTreeState mAPVTS;
     AudioProcessorValueTreeState::ParameterLayout createParameters();
@@ -121,6 +121,7 @@ private:
     Analyser outputAnalyser;
 
     dsp::Convolution mConvolution;
+    dsp::ProcessSpec mSpec;
 
     IIRFilter mLowShelfFilters[2];
     IIRFilter mMidPeakFilters[2];
