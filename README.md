@@ -24,11 +24,13 @@ v0.2:
 * Fancy graph plotting the EQ curve to visualize the EQ settings
 * Output frequency analyser
 
+v0.3
+* Moved to JUCE6
+* Using cmake
+
 ### Todo
 
 Prio:
-* Move to JUCE6
-* Use Cmake to build
 * cppcheck
 * I'm having some problem where sometimes it gets distorted after a while. Check code for memory/buffer/other issues.
 
