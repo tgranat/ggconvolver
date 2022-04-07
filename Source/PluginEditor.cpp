@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "config.h"
 
 //==============================================================================
 GgconvolverAudioProcessorEditor::GgconvolverAudioProcessorEditor (GgconvolverAudioProcessor& p)
@@ -30,7 +31,8 @@ void GgconvolverAudioProcessorEditor::paint (Graphics& g)
 {
     g.setColour(Colours::white);
     g.setFont(Font("Ariel", 15.0f, Font::bold));
-    g.drawFittedText("Simple Speaker Simulator 0.3.0", 0, 0, getWidth(), 30, Justification::centred, 1);
+    std::string version = PROJECT_VERSION; // from config.h
+    g.drawFittedText("Simple Speaker Simulator " + version, 0, 0, getWidth(), 30, Justification::centred, 1);
  }
 
 void GgconvolverAudioProcessorEditor::resized()

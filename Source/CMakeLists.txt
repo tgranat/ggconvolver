@@ -1,5 +1,10 @@
 set (BaseTargetName ${PROJECT_NAME})
 
+# Create config.h which contains version number etc.
+configure_file(config.h.in config.h)
+# Specify the output directory as an include directory so config.h is available when compiling
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 # Set VST3_COPY_DIR to directory if you want result to be copied
 set (Copy_Plugin "FALSE")
 if ( VST3_COPY_DIR )
