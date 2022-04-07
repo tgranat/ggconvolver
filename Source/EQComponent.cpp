@@ -198,7 +198,7 @@ void EQComponent::paint(Graphics& g)
     for (int i = 0; i < 10; ++i) {
         g.setColour(Colours::silver.withAlpha(0.3f));
         auto x = mPlotFrame.getX() + mPlotFrame.getWidth() * i * 0.1f;
-        if (i > 0) g.drawVerticalLine(roundToInt(x), mPlotFrame.getY(), mPlotFrame.getBottom());
+        if (i > 0) g.drawVerticalLine(roundToInt(x), (float)mPlotFrame.getY(), (float)mPlotFrame.getBottom());
 
         g.setColour(Colours::silver);
         auto freq = getFrequencyForPosition(i * 0.1f);
@@ -206,17 +206,17 @@ void EQComponent::paint(Graphics& g)
             roundToInt(x + 3), mPlotFrame.getBottom() - 18, 50, 15, Justification::left, 1);
     }
     g.setColour(Colours::silver.withAlpha(0.3f));
-    g.drawHorizontalLine(roundToInt(mPlotFrame.getY()), mPlotFrame.getX(), mPlotFrame.getRight());
-    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.25 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
-    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.5 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
-    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.75 * mPlotFrame.getHeight()), mPlotFrame.getX(), mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY()), (float)mPlotFrame.getX(), (float)mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.25 * mPlotFrame.getHeight()), (float)mPlotFrame.getX(), (float)mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.5 * mPlotFrame.getHeight()), (float)mPlotFrame.getX(), (float)mPlotFrame.getRight());
+    g.drawHorizontalLine(roundToInt(mPlotFrame.getY() + 0.75 * mPlotFrame.getHeight()), (float)mPlotFrame.getX(), (float)mPlotFrame.getRight());
 
     g.setColour(Colours::silver);
     float maxDb = processor.getMaxDb();
     g.drawFittedText(String(maxDb) + " dB", mPlotFrame.getX() + 3, mPlotFrame.getY() + 2, 50, 14, Justification::left, 1);
-    g.drawFittedText(String(maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.25 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
-    g.drawFittedText(" 0 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.5 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
-    g.drawFittedText(String(-maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2 + 0.75 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+    g.drawFittedText(String(maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2.0 + 0.25 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+    g.drawFittedText(" 0 dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2.0 + 0.5 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
+    g.drawFittedText(String(-maxDb / 2) + " dB", mPlotFrame.getX() + 3, roundToInt(mPlotFrame.getY() + 2.0 + 0.75 * mPlotFrame.getHeight()), 50, 14, Justification::left, 1);
 
     processor.createAnalyserPlot(analyserPath, mPlotFrame, 20.0f);
     g.setColour(Colours::blue.withAlpha(0.4f));

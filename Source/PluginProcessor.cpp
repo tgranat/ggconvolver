@@ -224,12 +224,12 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 }
 
 // Initiate/update convolution engine with parameters set by GUI
-void GgconvolverAudioProcessor::updateConvolution(double sampleRate, juce::uint32 blockSize, juce::uint32 totalNumInputChannels) {
+void GgconvolverAudioProcessor::updateConvolution(double sampleRate, juce::uint32 maxBlockSize, juce::uint32 totalNumInputChannels) {
     mConvolution.reset();
     // 0 means no limit for original impulse response size
     mConvolution.loadImpulseResponse(mIrData, mIrSize, dsp::Convolution::Stereo::no, dsp::Convolution::Trim::no, 0, dsp::Convolution::Normalise::yes);
     mSpec.sampleRate = sampleRate;
-    mSpec.maximumBlockSize = blockSize;
+    mSpec.maximumBlockSize = maxBlockSize;
     mSpec.numChannels = totalNumInputChannels;
     mConvolution.prepare(mSpec);
 }
@@ -334,7 +334,7 @@ void GgconvolverAudioProcessor::updateParams() {
     // High shelving filter gain
     mHighShelfGain = mAPVTS.getRawParameterValue("HIGH")->load();
     // IR data id
-    mIrNumber = mAPVTS.getRawParameterValue("IRCHOICE")->load();
+    mIrNumber = (int) mAPVTS.getRawParameterValue("IRCHOICE")->load();
     // Size of IR
     String irName = BinaryData::namedResourceList[mIrNumber];
     mIrData = BinaryData::getNamedResource(irName.toRawUTF8(), mIrSize);
@@ -400,16 +400,16 @@ void GgconvolverAudioProcessor::createFrequencyPlot(Path & p, const std::vector<
     FloatVectorOperations::multiply(mMagnitudes.data(), mHighMagnitudes.data(), static_cast<int> (mMidMagnitudes.size()));
 
     float yPos = float(mags[0] > 0 ? bounds.getCentreY() - pixelsPerDouble * std::log(mags[0]) / std::log(2) : bounds.getBottom());
-    if (yPos < bounds.getY()) yPos = bounds.getY();
-    if (yPos > bounds.getBottom()) yPos = bounds.getBottom();
-    p.startNewSubPath(bounds.getX(), yPos);
+    if (yPos < bounds.getY()) yPos = (float) bounds.getY();
+    if (yPos > bounds.getBottom()) yPos = (float) bounds.getBottom();
+    p.startNewSubPath((float) bounds.getX(), yPos);
     const double xFactor = static_cast<double> (bounds.getWidth()) / mFrequencies.size();
 
     for (size_t i = 1; i < mFrequencies.size(); ++i)
     {
         yPos = float(mags[i] > 0 ? bounds.getCentreY() - pixelsPerDouble * std::log(mags[i]) / std::log(2) : bounds.getBottom());
-        if (yPos < bounds.getY()) yPos = bounds.getY();
-        if (yPos > bounds.getBottom()) yPos = bounds.getBottom();
+        if (yPos < bounds.getY()) yPos = (float) bounds.getY();
+        if (yPos > bounds.getBottom()) yPos = (float) bounds.getBottom();
         p.lineTo(float(bounds.getX() + i * xFactor), yPos);
     }
 }

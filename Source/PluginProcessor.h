@@ -17,13 +17,13 @@ namespace Constant {
     const float compensatingOutGain = 2.f;
     // Hardcoded and default values
     const float lowShelfFilterQ = 0.667f;
-    const float lowShelfFrequency = 100.f;
+    const float lowShelfFrequency = 200.f;
     const float midPeakFilterQ = 1.141f;
     const float midPeakFrequencyLow = 100.f;
     const float midPeakFrequencyHigh = 5000.f;
     const float midPeakFrequency = 1000.f;
     const float highShelfFilterQ = 0.667f;
-    const float highShelfFrequency = 5000.f;
+    const float highShelfFrequency = 4000.f;
     const float oneOctaveQ = 1.141f;
     const float twoOctavesQ = 0.667f;
     const float maxDb = 12.f;                     // Max level dB in graph
@@ -110,7 +110,7 @@ public:
     AudioProcessorValueTreeState& getAPVTS() { return mAPVTS; }
 
 private:
-    void updateConvolution(double sampleRate, juce::uint32 blockSize, juce::uint32 totalNumInputChannels);
+    void updateConvolution(double sampleRate, juce::uint32 maxBlockSize, juce::uint32 totalNumInputChannels);
     
     AudioProcessorValueTreeState mAPVTS;
     AudioProcessorValueTreeState::ParameterLayout createParameters();
