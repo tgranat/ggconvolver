@@ -31,6 +31,7 @@ v0.3
 ### Todo
 
 Prio:
+* Unique VST3 UID
 * cppcheck
 * I'm having some problem where sometimes it gets distorted after a while. Check code for memory/buffer/other issues.
 
